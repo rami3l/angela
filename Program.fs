@@ -1,0 +1,1 @@
+﻿printfn "Heroes never die!"
