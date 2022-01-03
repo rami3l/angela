@@ -1,7 +1,6 @@
 module Angela.Commands
 
 open FSharpPlus
-open FSharpPlus.Data
 open Funogram.Api
 open Funogram.Telegram.Api
 open Funogram.Telegram.Bot
@@ -13,18 +12,13 @@ let onHello (context: UpdateContext) =
 
     monad {
         let! message = context.Update.Message
-
-        let! name =
-            message.From
-            |> Option.map (fun user -> user.FirstName)
+        let! name = message.From |>> (fun user -> user.FirstName)
 
         $"{name}, I'm right beside you!"
         |> sendMessage message.Chat.Id
         |> api context.Config
         |> Async.RunSynchronously
-        |> Result.mapError (fun e ->
-            Trace.warning $"while sending message: {e}"
-            e)
+        |> Result.mapError (tap (fun e -> Trace.warning $"while sending message: {e}"))
     }
     |> ignore
 
@@ -47,9 +41,7 @@ let onDecide (args: string) (context: UpdateContext) =
         |> sendMessage message.Chat.Id
         |> api context.Config
         |> Async.RunSynchronously
-        |> Result.mapError (fun e ->
-            Trace.warning $"while sending message: {e}"
-            e)
+        |> Result.mapError (tap (fun e -> Trace.warning $"while sending message: {e}"))
     }
     |> ignore
 

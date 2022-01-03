@@ -3,8 +3,6 @@
 open Angela.Commands
 open FSharpPlus
 open FSharpPlus.Data
-open Funogram.Api
-open Funogram.Telegram.Api
 open Funogram.Telegram.Bot
 open Microsoft.FSharpLu.Logging
 open System
@@ -18,12 +16,10 @@ let onUpdate (context: UpdateContext) =
         let! message = update.Message
 
         let name =
-            message.From
-            |> Option.map (fun user -> user.FirstName)
-            |> unwrap
+            message.From |>> (fun user -> user.FirstName)
 
-        let txt = message.Text |> unwrap
-        Trace.verbose $"[{update.UpdateId}] \t {name}: {txt}"
+        let txt = message.Text
+        Trace.verbose $"[{update.UpdateId}] \t {unwrap name}: {unwrap txt}"
     }
     |> ignore
 
@@ -50,6 +46,6 @@ let main (_: array<string>) : int =
         Trace.info "Angela is waking up..."
         token |> launch |> Async.RunSynchronously
     }
-    |> Result.mapError (fun e -> Trace.critical $"{e}")
-    |> Result.map (fun _ -> 0)
-    |> Result.defaultValue 1
+    |> either (konst 0) (fun e ->
+        Trace.critical $"{e}"
+        1)
