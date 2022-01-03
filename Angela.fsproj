@@ -13,6 +13,7 @@
     <PackageReference Include="ExtCore" Version="0.8.46" />
     <PackageReference Include="Funogram" Version="2.0.3" />
     <PackageReference Include="Funogram.Telegram" Version="4.4.2.3" />
+    <PackageReference Include="Microsoft.FSharpLu" Version="0.11.7" />
   </ItemGroup>
 
 </Project>
