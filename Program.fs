@@ -1,6 +1,7 @@
 ﻿module Angela.Program
 
 open FSharpPlus
+open FSharpPlus.Data
 open Funogram.Api
 open Funogram.Telegram.Api
 open Funogram.Telegram.Bot
@@ -21,8 +22,9 @@ let onHello (context: UpdateContext) =
         |> sendMessage message.Chat.Id
         |> api context.Config
         |> Async.RunSynchronously
-        |> Result.mapError (fun e -> Trace.warning $"while sending message: {e}")
-        |> ignore
+        |> Result.mapError (fun e ->
+            Trace.warning $"while sending message: {e}"
+            e)
     }
     |> ignore
 
@@ -45,8 +47,9 @@ let onDecide (args: string) (context: UpdateContext) =
         |> sendMessage message.Chat.Id
         |> api context.Config
         |> Async.RunSynchronously
-        |> Result.mapError (fun e -> Trace.warning $"while sending message: {e}")
-        |> ignore
+        |> Result.mapError (fun e ->
+            Trace.warning $"while sending message: {e}"
+            e)
     }
     |> ignore
 
@@ -87,7 +90,7 @@ let launch (token: string) : Async<unit> =
 
 [<EntryPoint>]
 let main (_: array<string>) : int =
-    new Diagnostics.ConsoleTraceListener()
+    new Essential.Diagnostics.ColoredConsoleTraceListener()
     |> Diagnostics.Trace.Listeners.Add
     |> ignore
 
@@ -97,6 +100,5 @@ let main (_: array<string>) : int =
         token |> launch |> Async.RunSynchronously
     }
     |> Result.mapError (fun e -> Trace.critical $"{e}")
-    |> ignore
-
-    0
+    |> Result.map (fun _ -> 0)
+    |> Result.defaultValue 1
