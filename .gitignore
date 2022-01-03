@@ -13,3 +13,5 @@ bin
 .ionide/
 
 
+# Added by ionide
+.fake
