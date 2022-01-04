@@ -1,6 +1,8 @@
 ﻿module Angela.Program
 
 open Angela.Commands
+open dotenv.net
+open dotenv.net.Utilities
 open FSharpPlus
 open FSharpPlus.Data
 open Funogram.Telegram.Bot
@@ -28,9 +30,15 @@ let onUpdate (context: UpdateContext) =
 let getToken () : Result<string, string> =
     let envVarName = "ANGELA_TELEGRAM_BOT_TOKEN"
 
-    match Environment.GetEnvironmentVariable envVarName with
-    | null -> Error $"while fetching bot token: environment variable {envVarName} not found"
-    | token -> Ok token
+    let tryFetch src =
+        match src envVarName with
+        | null -> Error $"while fetching bot token: environment variable {envVarName} not found"
+        | token -> Ok token
+
+    tryFetch Environment.GetEnvironmentVariable
+    <|> tryFetch (fun name ->
+        DotEnv.Load()
+        EnvReader.GetStringValue name)
 
 let launch (token: string) : Async<unit> =
     startBot { defaultConfig with Token = token } onUpdate None

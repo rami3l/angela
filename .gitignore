@@ -15,3 +15,6 @@ bin
 
 # Added by ionide
 .fake
+
+# Environment variables
+.env
