@@ -29,10 +29,9 @@ let onDecide (args: string) (context: UpdateContext) =
         let! message = context.Update.Message
 
         let! args =
-            if args |> String.IsNullOrEmpty then
-                None
-            else
-                args.Split ' ' |> Some
+            Some args
+            |> Option.filter (not << String.IsNullOrEmpty)
+            |> map (fun args -> args.Split ' ')
 
         let idx = Random().Next(args.Length)
         let item = args.[idx]
