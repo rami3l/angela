@@ -10,7 +10,7 @@ COPY ./* ./
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine as angela
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS angela
 WORKDIR /app
 COPY --from=angela-builder /app/out .
 ENTRYPOINT ["dotnet", "Angela.dll"]
