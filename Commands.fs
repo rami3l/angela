@@ -95,7 +95,7 @@ let onEtymology (args: string) (context: UpdateContext) =
             extract
             |> String.split [ "\r\n"; "\r"; "\n" ]
             // ! Destructive operation! We only keep the first etymology...
-            |> Seq.skipWhile (not << String.isSubString "Etymology")
+            |> Seq.skipWhile (not << String.isSubString "= Etymology")
             |> Seq.skip 1
             |> Seq.takeWhile (not << String.startsWith "=")
             |> Seq.filter (not << String.IsNullOrWhiteSpace)
