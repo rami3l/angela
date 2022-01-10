@@ -9,6 +9,7 @@ open Microsoft.FSharpLu.Logging
 open System
 open System.Text.RegularExpressions
 open System.Web
+open Microsoft.FSharpLu
 
 let sendText (context: UpdateContext) (text: string) =
     monad {
@@ -81,7 +82,7 @@ let onEtymology (args: string) (context: UpdateContext) =
             | _ ->
                 Trace.warning $"invalid wiktionary extract: {result}"
 
-                $"Emmm... Is there really such a word?"
+                "Emmm... Is there really such a word?"
                 |> sendText context
                 |> ignore
 
@@ -101,13 +102,16 @@ let onEtymology (args: string) (context: UpdateContext) =
             |> Seq.filter (not << String.IsNullOrWhiteSpace)
             |> curry String.Join "\n"
 
-        Trace.info $"/etymology: got first entry `{firstEntry}`"
-
         let url =
             $"https://en.wiktionary.org/wiki/{HttpUtility.UrlEncode args}"
 
         return!
-            $"Let me look it up...\n\n{args}:\n\n{firstEntry}\n\nsrc: {url}"
+            if String.IsNullOrWhiteSpace firstEntry then
+                Trace.info $"/etymology: no etymology entries found`"
+                $"Let me look it up...\n\nOops, it seems that I can't find the etymology in {url}..."
+            else
+                Trace.info $"/etymology: got first entry `{firstEntry}`"
+                $"Let me look it up...\n\n{args}:\n\n{firstEntry}\n\nsrc: {url}"
             |> sendText context
     }
     |> ignore
