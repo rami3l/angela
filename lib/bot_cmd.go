@@ -14,14 +14,14 @@ import (
 )
 
 func onHello(bot *tgb.Bot, msg *tgb.Message) {
-	bot.Send(msg.Sender, fmt.Sprintf("%s, I'm right beside you!", msg.Sender.FirstName))
+	bot.Send(msg.Chat, fmt.Sprintf("%s, I'm right beside you!", msg.Sender.FirstName))
 }
 
 func onDecide(bot *tgb.Bot, msg *tgb.Message) {
 	args := StripCmdHead(msg.Text)
 	// TODO: Refactor this with generic RandItem[T] when Golang v1.18 comes out.
 	item := args[rand.Intn(len(args))]
-	bot.Send(msg.Sender, fmt.Sprintf("Emmm... I'd say %s.", item))
+	bot.Send(msg.Chat, fmt.Sprintf("Emmm... I'd say %s.", item))
 }
 
 func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
@@ -51,7 +51,7 @@ func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 	matches := pat.FindStringSubmatch(resStr)
 	if len(matches) < 1 {
 		log.WithField("result", resStr).Info("/etymology: Wiktionary extract not found")
-		bot.Send(msg.Sender, "Emmm... Is there really such a word?")
+		bot.Send(msg.Chat, "Emmm... Is there really such a word?")
 	}
 
 	rawExtract := matches[1]
@@ -91,5 +91,5 @@ func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 		log.WithField("fstEntry", fstEntry).Info("/etymology: Got first entry")
 		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%s\n\nsrc: %s", arg, fstEntry, src)
 	}
-	bot.Send(msg.Sender, reply)
+	bot.Send(msg.Chat, reply)
 }
