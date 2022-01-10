@@ -29,6 +29,7 @@ func LaunchBot(token string) (err error) {
 
 	bot.Handle("/hello", handle(onHello))
 	bot.Handle("/decide", handle(onDecide))
+	bot.Handle("/etymology", handle(onEtymology))
 
 	bot.Start()
 	return
