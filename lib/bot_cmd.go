@@ -24,6 +24,23 @@ func onDecide(bot *tgb.Bot, msg *tgb.Message) {
 	bot.Send(msg.Chat, fmt.Sprintf("Emmm... I'd say %s.", item))
 }
 
+func onRustRelease(bot *tgb.Bot, msg *tgb.Message) {
+	// Based on https://forge.rust-lang.org/js/index.js.
+	curr := CurrentRustV1Release()
+	stable := curr
+	beta := curr.Beta()
+	nightly := curr.Nightly()
+	next := curr.Next()
+	const dtFmt = "02 Jan 2006"
+
+	bot.Send(msg.Chat, fmt.Sprintf("Oh, I just asked Ferris 🦀️:\n\n```\n%s\n%s\n%s\n%s\n```",
+		fmt.Sprintf("stable:\t%s\t(%s)", stable, stable.ReleaseDate().Format(dtFmt)),
+		fmt.Sprintf("beta:\t%s\t(%s)", beta, beta.ReleaseDate().Format(dtFmt)),
+		fmt.Sprintf("nightly:\t%s\t(%s)", nightly, nightly.ReleaseDate().Format(dtFmt)),
+		fmt.Sprintf("next:\t%s\t(%s)", next, next.ReleaseDate().Format(dtFmt)),
+	), &tgb.SendOptions{ParseMode: tgb.ModeMarkdown})
+}
+
 func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 	args := StripCmdHead(msg.Text)
 	arg := strings.Join(args, " ")
