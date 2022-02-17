@@ -41,6 +41,16 @@ func onRustRelease(bot *tgb.Bot, msg *tgb.Message) {
 	), &tgb.SendOptions{ParseMode: tgb.ModeMarkdown})
 }
 
+func onRandomWiki(bot *tgb.Bot, msg *tgb.Message) {
+	url, err := CaptureRedirect("https://en.wikipedia.org/wiki/Special:Random")
+	if err != nil {
+		log.Warning(err)
+		return
+	}
+	log.WithField("pageUrl", url).Info("/randomwiki: Got random page")
+	bot.Send(msg.Chat, fmt.Sprintf("(Paper fluttering...)\n\nHere you go!\n%s", url))
+}
+
 func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 	args := StripCmdHead(msg.Text)
 	arg := strings.Join(args, " ")
