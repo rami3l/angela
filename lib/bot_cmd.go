@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
@@ -25,19 +26,41 @@ func onDecide(bot *tgb.Bot, msg *tgb.Message) {
 }
 
 func onRustRelease(bot *tgb.Bot, msg *tgb.Message) {
-	// Based on https://forge.rust-lang.org/js/index.js.
-	curr := CurrentRustV1Release()
-	stable := curr
-	beta := curr.Beta()
-	nightly := curr.Nightly()
-	next := curr.Next()
-	const dtFmt = "02 Jan 2006"
+	type rustV1Release struct{ date time.Time }
 
-	bot.Send(msg.Chat, fmt.Sprintf("Oh, I just asked Ferris 🦀️:\n\n```\n%s\n%s\n%s\n%s\n```",
-		fmt.Sprintf("stable:\t%s\t(%s)", stable, stable.ReleaseDate().Format(dtFmt)),
-		fmt.Sprintf("beta:\t%s\t(%s)", beta, beta.ReleaseDate().Format(dtFmt)),
-		fmt.Sprintf("nightly:\t%s\t(%s)", nightly, nightly.ReleaseDate().Format(dtFmt)),
-		fmt.Sprintf("next:\t%s\t(%s)", next, next.ReleaseDate().Format(dtFmt)),
+	epoch := time.Date(2015, time.December, 10, 0, 0, 0, 0, time.UTC)
+	const (
+		epochRelease = 5
+		dtFmt        = "Jan 02 2006"
+	)
+
+	minor := func(r rustV1Release) int {
+		weeksSinceEpoch := int(r.date.Sub(epoch).Hours()) / (24 * 7)
+		if weeksSinceEpoch < 0 {
+			return -1
+		}
+		newReleases := weeksSinceEpoch / 6
+		return epochRelease + newReleases
+	}
+
+	releaseDate := func(r rustV1Release) time.Time {
+		newReleases := minor(r) - epochRelease
+		return epoch.AddDate(0, 0, newReleases*6*7)
+	}
+
+	sprintRelease := func(r rustV1Release) string {
+		return fmt.Sprintf("\tRust v1.%d\t(%s)", minor(r), releaseDate(r).Format(dtFmt))
+	}
+
+	// Based on https://forge.rust-lang.org/js/index.js.
+	now := time.Now()
+	stable := rustV1Release{now}
+	beta := rustV1Release{now.AddDate(0, 0, 7*6)}
+	nightly := rustV1Release{now.AddDate(0, 0, 7*6*2)}
+	next := rustV1Release{now.AddDate(0, 0, 7*6*3)}
+
+	bot.Send(msg.Chat, fmt.Sprintf("Oh, I just asked Ferris 🦀️:\n\n```\nstable:%s\nbeta:%s\nnightly:%s\nnext:%s\n```",
+		sprintRelease(stable), sprintRelease(beta), sprintRelease(nightly), sprintRelease(next),
 	), &tgb.SendOptions{ParseMode: tgb.ModeMarkdown})
 }
 

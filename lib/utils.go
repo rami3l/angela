@@ -2,10 +2,8 @@ package lib
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func StripCmdHead(cmd string) []string {
@@ -24,48 +22,5 @@ func CaptureRedirect(url string) (redirected string, err error) {
 		return
 	}
 	redirected = res.Request.URL.String()
-	return
-}
-
-type RustV1Release struct{ date time.Time }
-
-var epochTime time.Time = time.Date(2015, time.December, 10, 0, 0, 0, 0, time.UTC)
-
-const epochRelease = 5
-
-func (r RustV1Release) Minor() int {
-	weeksSinceEpoch := int(r.date.Sub(epochTime).Hours()) / (24 * 7)
-	if weeksSinceEpoch < 0 {
-		return -1
-	}
-	newReleases := weeksSinceEpoch / 6
-	return epochRelease + newReleases
-}
-
-func (r RustV1Release) ReleaseDate() time.Time {
-	newReleases := r.Minor() - epochRelease
-	return epochTime.AddDate(0, 0, newReleases*6*7)
-}
-
-func (r RustV1Release) String() string {
-	return fmt.Sprintf("Rust v1.%d", r.Minor())
-}
-
-func CurrentRustV1Release() RustV1Release {
-	return RustV1Release{time.Now()}
-}
-
-func (r RustV1Release) Beta() (res RustV1Release) {
-	res.date = r.date.AddDate(0, 0, 7*6)
-	return
-}
-
-func (r RustV1Release) Nightly() (res RustV1Release) {
-	res.date = r.date.AddDate(0, 0, 7*6*2)
-	return
-}
-
-func (r RustV1Release) Next() (res RustV1Release) {
-	res.date = r.date.AddDate(0, 0, 7*6*3)
 	return
 }
