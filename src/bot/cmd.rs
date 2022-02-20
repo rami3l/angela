@@ -5,10 +5,13 @@ use chrono::{Date, Duration, NaiveDate, Utc};
 use indoc::indoc;
 use itertools::Itertools;
 use rand::Rng;
+use regex::Regex;
 use teloxide::types::ParseMode;
 #[allow(clippy::wildcard_imports)]
 use teloxide::{prelude2::*, utils::command::BotCommand};
-use tracing::info;
+use tracing::{debug, info, warn};
+
+use crate::bot::utils::{unescape, urlencode};
 
 #[derive(BotCommand, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -21,6 +24,8 @@ pub(crate) enum Command {
     Decide(String),
     #[command(description = "🦀️")]
     RustRelease,
+    #[command(description = "Doctor's orders!")]
+    Etymology(String),
 }
 
 pub(crate) async fn handle(bot: AutoSend<Bot>, msg: Message, command: Command) -> Result<()> {
@@ -33,6 +38,7 @@ pub(crate) async fn handle(bot: AutoSend<Bot>, msg: Message, command: Command) -
         Hello => hello(&bot, &msg).await,
         Decide(options) => decide(&bot, &msg, &options).await,
         RustRelease => rust_release(&bot, &msg).await,
+        Etymology(query) => etymology(&bot, &msg, &query).await,
     }
 }
 
@@ -52,7 +58,8 @@ async fn hello(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
 async fn decide(bot: &AutoSend<Bot>, msg: &Message, options: &str) -> Result<()> {
     let options = options.split_whitespace().collect_vec();
     if options.is_empty() {
-        bot.send_message(msg.chat_id(), "Emmm... What's on your mind?")
+        let title = msg.chat.first_name().unwrap_or("My friend");
+        bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
             .await?;
         return Ok(());
     }
@@ -119,9 +126,99 @@ async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
                 next: {}
                 ```
             "#},
-                stable, beta, nightly, next
+                stable, beta, nightly, next,
             ),
         )
         .await?;
+    Ok(())
+}
+
+async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result<()> {
+    if keywords.is_empty() {
+        let title = msg.chat.first_name().unwrap_or("My friend");
+        bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
+            .await?;
+        return Ok(());
+    }
+
+    let endpoint = "https://en.wiktionary.org/w/api.php";
+    let query = &[
+        ("action", "query"),
+        ("format", "json"),
+        ("titles", keywords),
+        ("prop", "extracts"),
+        ("explaintext", ""),
+    ];
+
+    let resp = reqwest::Client::new()
+        .get(endpoint)
+        .query(query)
+        .send()
+        .await?;
+    let resp_txt = resp.text().await?;
+
+    let pat = Regex::new(r#""extract":"(.*)""#)?;
+    let captures = pat.captures(&resp_txt).filter(|c| c.len() >= 1);
+    if captures.is_none() {
+        info!("/etymology: Wiktionary extract not found");
+        bot.send_message(msg.chat_id(), "Emmm... Is there really such a word?")
+            .await?;
+        return Ok(());
+    }
+    let raw_extract = captures.and_then(|c| c.get(1)).map_or("", |s| s.as_str());
+    info!("/etymology: Got raw extract `{raw_extract}`");
+    let extract = unescape(raw_extract);
+    if extract.is_err() {
+        warn!("/etymology: Error unescaping extract `{raw_extract}`");
+    }
+    let extract = extract.unwrap();
+    debug!("/etymology: Got extract `{extract}`");
+
+    let first_entry = extract
+        .lines()
+        // ! Destructive operation! We only keep the first etymology...
+        .skip_while(|ln| !ln.contains("= Etymology"))
+        .skip(1)
+        .take_while(|ln| !ln.starts_with('='))
+        .map(str::trim)
+        .filter(|ln| !ln.is_empty())
+        .join("\n");
+    let first_entry = first_entry.trim();
+
+    let source = format!("https://en.wiktionary.org/wiki/{}", urlencode(keywords));
+
+    if first_entry.is_empty() {
+        info!("/etymology: No etymology entries found");
+        bot.send_message(
+            msg.chat_id(),
+            format!(
+                indoc! {"
+                    Let me look it up...
+                    
+                    Oops, it seems that I can't find the etymology in {}...
+                "},
+                source,
+            ),
+        )
+        .await?;
+    } else {
+        info!("/etymology: Got first entry `{first_entry}`");
+        bot.send_message(
+            msg.chat_id(),
+            &format!(
+                indoc! {"
+                        Let me look it up...
+                        
+                        {}:
+
+                        {}
+
+                        src: {}
+                    "},
+                keywords, first_entry, source,
+            ),
+        )
+        .await?;
+    }
     Ok(())
 }

@@ -1,4 +1,6 @@
 mod cmd;
+mod utils;
+
 use std::sync::Arc;
 
 use teloxide::dispatching::update_listeners;
