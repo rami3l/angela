@@ -4,6 +4,16 @@ pub fn unescape(s: &str) -> Result<String> {
     Ok(serde_json::from_str(&format!(r#""{}""#, s))?)
 }
 
+pub async fn capture_redir(url: &str) -> Result<String> {
+    Ok(reqwest::Client::new()
+        .get(url)
+        .send()
+        .await?
+        .url()
+        .as_str()
+        .into())
+}
+
 pub fn urlencode(s: &str) -> String {
     url::form_urlencoded::Serializer::new(String::new())
         .append_key_only(s)
@@ -24,6 +34,14 @@ mod tests {
         let original = "春眠暁を覚えず";
         let expected = "%E6%98%A5%E7%9C%A0%E6%9A%81%E3%82%92%E8%A6%9A%E3%81%88%E3%81%9A";
         assert_eq!(urlencode(original), expected);
+    }
+
+    #[tokio::test]
+    async fn test_capture_redir() -> Result<()> {
+        let url = "https://duck.com";
+        let got = capture_redir(url).await?;
+        assert_eq!("https://duckduckgo.com/", got);
+        Ok(())
     }
 
     #[test]

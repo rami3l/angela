@@ -11,7 +11,7 @@ use teloxide::types::ParseMode;
 use teloxide::{prelude2::*, utils::command::BotCommand};
 use tracing::{debug, info, warn};
 
-use crate::bot::utils::{unescape, urlencode};
+use super::utils::{capture_redir, unescape, urlencode};
 
 #[derive(BotCommand, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -24,8 +24,10 @@ pub(crate) enum Command {
     Decide(String),
     #[command(description = "🦀️")]
     RustRelease,
-    #[command(description = "Doctor's orders!")]
+    #[command(description = "📖")]
     Etymology(String),
+    #[command(description = "❓")]
+    RandomWiki(String),
 }
 
 pub(crate) async fn handle(bot: AutoSend<Bot>, msg: Message, command: Command) -> Result<()> {
@@ -39,6 +41,7 @@ pub(crate) async fn handle(bot: AutoSend<Bot>, msg: Message, command: Command) -
         Decide(options) => decide(&bot, &msg, &options).await,
         RustRelease => rust_release(&bot, &msg).await,
         Etymology(query) => etymology(&bot, &msg, &query).await,
+        RandomWiki(src) => random_wiki(&bot, &msg, &src).await,
     }
 }
 
@@ -220,5 +223,29 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
         )
         .await?;
     }
+    Ok(())
+}
+
+async fn random_wiki(bot: &AutoSend<Bot>, msg: &Message, mut src: &str) -> Result<()> {
+    if src.is_empty() {
+        src = "commons.wikimedia.org";
+    }
+
+    let endpoint = format!("https://{src}/wiki/Special:Random");
+    let url = capture_redir(&endpoint).await?;
+
+    bot.send_message(
+        msg.chat_id(),
+        format!(
+            indoc! {"
+                (Paper fluttering...)
+                
+                Here you go!
+                {}
+            "},
+            url,
+        ),
+    )
+    .await?;
     Ok(())
 }
