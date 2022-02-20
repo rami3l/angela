@@ -1,22 +1,26 @@
-# TODO: Fix this file for Rust
+FROM lukemathwalker/cargo-chef:latest-rust-alpine AS chef
 
-# Build Stage
-FROM rust:1.58.1-alpine as angela-builder
-
-# Set environment variable
+# ===== Plan Stage =====
+FROM chef as angela-planner
 ENV APP_NAME angela
 WORKDIR /app/${APP_NAME}
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-COPY . /app/${APP_NAME}
-
-# build with to make it run with alpine.
-RUN apk add --no-cache musl-dev
+# ===== Build Stage =====
+FROM chef as angela-builder
+ENV APP_NAME angela
+WORKDIR /app/${APP_NAME}
+COPY --from=angela-planner /app/${APP_NAME}/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
+# This is not needed as it's included in `chef` already.
+# RUN apk add --no-cache musl-dev
 RUN cargo install --path .
 
-# Run Stage
+# ===== Run Stage =====
 FROM alpine:3.15 AS angela
-
-# Set environment variable
 ENV APP_NAME angela
 
 # Copy only required data into this image
