@@ -12,7 +12,7 @@ anyhow = "1.0.54"
 clap = { version = "3.1.0", features = ["cargo", "derive", "env"] }
 clap-verbosity-flag = "1.0.0"
 dotenv = "0.15.0"
-teloxide = "0.7.0"
+teloxide = { version = "0.7.0", features = ["macros", "auto-send"] }
 tokio = { version = "1.17.0", features = ["macros", "rt-multi-thread"] }
 tracing = "0.1.31"
 tracing-log = "0.1.2"

@@ -32,6 +32,7 @@ impl Angela {
         tracing_subscriber::fmt()
             .with_max_level(self.verbose.log_level().map(|l| l.as_trace()))
             .init();
-        bot::launch(self.token.with_context(|| anyhow!("bot token not found"))?).await
+        bot::launch(self.token.with_context(|| anyhow!("bot token not found"))?).await;
+        Ok(())
     }
 }
