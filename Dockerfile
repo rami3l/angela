@@ -1,28 +1,33 @@
-# Build Stage
-FROM golang:1.17-alpine as angela-builder
+FROM lukemathwalker/cargo-chef:latest-rust-alpine AS chef
 
-# Set environment variable
+# ===== Plan Stage =====
+FROM chef as angela-planner
 ENV APP_NAME angela
-ENV CMD_PATH main.go
+WORKDIR /app/${APP_NAME}
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Copy application data into image
-COPY . $GOPATH/src/$APP_NAME
-WORKDIR $GOPATH/src/$APP_NAME
+# ===== Build Stage =====
+FROM chef as angela-builder
+ENV APP_NAME angela
+WORKDIR /app/${APP_NAME}
+COPY --from=angela-planner /app/${APP_NAME}/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
+# This is not needed as it's included in `chef` already.
+# RUN apk add --no-cache musl-dev
+RUN cargo install --path .
 
-# Budild application
-RUN CGO_ENABLED=0 go build -v -o /$APP_NAME $GOPATH/src/$APP_NAME/$CMD_PATH
-
-# Run Stage
+# ===== Run Stage =====
 FROM alpine:3.15 AS angela
-
-# Set environment variable
 ENV APP_NAME angela
 
 # Copy only required data into this image
-COPY --from=angela-builder /$APP_NAME .
+COPY --from=angela-builder /usr/local/cargo/bin/$APP_NAME .
 
 # Expose application port
-#EXPOSE 8081
+# EXPOSE 8081
 
 # Start app
 CMD ./$APP_NAME
