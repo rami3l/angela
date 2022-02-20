@@ -18,12 +18,15 @@ pub struct Angela {
     #[clap(flatten)]
     verbose: Verbosity,
 
+    /// The telegram bot token.
     #[clap(long, env = "ANGELA_TELEGRAM_BOT_TOKEN")]
     token: Option<String>,
 }
 
 impl Angela {
     pub async fn launch() -> Result<()> {
+        // Read the `.env` file. We don't care if it exists or not:
+        // finally it's the environment variable that matters.
         drop(dotenv::dotenv());
         Self::parse().dispatch().await
     }

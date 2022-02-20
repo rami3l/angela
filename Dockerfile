@@ -27,7 +27,7 @@ ENV APP_NAME angela
 COPY --from=angela-builder /usr/local/cargo/bin/$APP_NAME .
 
 # Expose application port
-#EXPOSE 8081
+# EXPOSE 8081
 
 # Start app
 CMD ./$APP_NAME
