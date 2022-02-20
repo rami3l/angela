@@ -24,7 +24,7 @@ pub struct Angela {
 
 impl Angela {
     pub async fn launch() -> Result<()> {
-        dotenv::dotenv()?;
+        drop(dotenv::dotenv());
         Self::parse().dispatch().await
     }
 

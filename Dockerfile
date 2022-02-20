@@ -1,18 +1,17 @@
 # TODO: Fix this file for Rust
 
 # Build Stage
-FROM golang:1.17-alpine as angela-builder
+FROM rust:1.58.1-alpine as angela-builder
 
 # Set environment variable
 ENV APP_NAME angela
-ENV CMD_PATH main.go
+WORKDIR /app/${APP_NAME}
 
-# Copy application data into image
-COPY . $GOPATH/src/$APP_NAME
-WORKDIR $GOPATH/src/$APP_NAME
+COPY . /app/${APP_NAME}
 
-# Budild application
-RUN CGO_ENABLED=0 go build -v -o /$APP_NAME $GOPATH/src/$APP_NAME/$CMD_PATH
+# build with to make it run with alpine.
+RUN apk add --no-cache musl-dev
+RUN cargo install --path .
 
 # Run Stage
 FROM alpine:3.15 AS angela
@@ -21,7 +20,7 @@ FROM alpine:3.15 AS angela
 ENV APP_NAME angela
 
 # Copy only required data into this image
-COPY --from=angela-builder /$APP_NAME .
+COPY --from=angela-builder /usr/local/cargo/bin/$APP_NAME .
 
 # Expose application port
 #EXPOSE 8081

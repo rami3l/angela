@@ -3,9 +3,8 @@ mod utils;
 
 use std::sync::Arc;
 
-use teloxide::dispatching::update_listeners;
 #[allow(clippy::wildcard_imports)]
-use teloxide::{dispatching2::Dispatcher, prelude2::*};
+use teloxide::{dispatching::update_listeners, dispatching2::Dispatcher, prelude2::*};
 use tracing::{debug, info};
 
 pub(crate) async fn launch(token: impl Into<String>) {
