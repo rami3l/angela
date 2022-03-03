@@ -52,7 +52,11 @@ async fn help(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
 }
 
 async fn hello(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
-    let title = msg.chat.first_name().unwrap_or("Hi");
+    let title = msg
+        .from()
+        .map(|src| &src.first_name as &str)
+        .filter(|s| !s.is_empty())
+        .unwrap_or("Hi");
     bot.send_message(msg.chat_id(), format!("{title}, I'm right beside you!"))
         .await?;
     Ok(())
@@ -61,7 +65,11 @@ async fn hello(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
 async fn decide(bot: &AutoSend<Bot>, msg: &Message, options: &str) -> Result<()> {
     let options = options.split_whitespace().collect_vec();
     if options.is_empty() {
-        let title = msg.chat.first_name().unwrap_or("My friend");
+        let title = msg
+            .from()
+            .map(|src| &src.first_name as &str)
+            .filter(|s| !s.is_empty())
+            .unwrap_or("My friend");
         bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
             .await?;
         return Ok(());
@@ -138,7 +146,11 @@ async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
 
 async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result<()> {
     if keywords.is_empty() {
-        let title = msg.chat.first_name().unwrap_or("My friend");
+        let title = msg
+            .from()
+            .map(|src| &src.first_name as &str)
+            .filter(|s| !s.is_empty())
+            .unwrap_or("My friend");
         bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
             .await?;
         return Ok(());
