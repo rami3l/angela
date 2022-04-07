@@ -1,6 +1,8 @@
 use std::fmt::{self, Display};
 
 use anyhow::Result;
+#[allow(clippy::wildcard_imports)]
+use futures::prelude::*;
 use indoc::indoc;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -250,8 +252,21 @@ async fn random_wiki(bot: &AutoSend<Bot>, msg: &Message, mut src: &str) -> Resul
         src = "commons.wikimedia.org";
     }
 
-    let endpoint = format!("https://{src}/wiki/Special:Random");
-    let url = capture_redir(&endpoint).await?;
+    let prefixes = &["wiki/", "title/", ""];
+    let url = Box::pin(stream::iter(prefixes).map(anyhow::Ok).try_filter_map(
+        |prefix| async move {
+            let endpoint = format!("https://{src}/{prefix}Special:Random");
+            let redirected = capture_redir(&endpoint).await?;
+            let url = (endpoint.to_lowercase() != redirected.to_lowercase()).then(|| {
+                info!("/randomwiki: Detected redirection `{endpoint}` -> `{redirected}`");
+                redirected
+            });
+            Ok(url)
+        },
+    ))
+    .try_next()
+    .await?
+    .unwrap_or_else(|| format!("https://{src}/Special:Random"));
 
     bot.send_message(
         msg.chat.id,
