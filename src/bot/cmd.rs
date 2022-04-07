@@ -1,14 +1,18 @@
-use std::fmt::Display;
+use std::fmt::{self, Display};
 
 use anyhow::Result;
-use chrono::{Date, Duration, NaiveDate, Utc};
 use indoc::indoc;
 use itertools::Itertools;
+use once_cell::sync::Lazy;
 use rand::Rng;
 use regex::Regex;
 use teloxide::types::ParseMode;
 #[allow(clippy::wildcard_imports)]
 use teloxide::{prelude2::*, utils::command::BotCommand};
+use time::{
+    format_description::{self, FormatItem},
+    Date, Duration, Month, OffsetDateTime,
+};
 use tracing::{debug, info, warn};
 
 use super::utils::{capture_redir, unescape, urlencode};
@@ -57,7 +61,7 @@ async fn hello(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
         .map(|src| &src.first_name as &str)
         .filter(|s| !s.is_empty())
         .unwrap_or("Hi");
-    bot.send_message(msg.chat_id(), format!("{title}, I'm right beside you!"))
+    bot.send_message(msg.chat.id, format!("{title}, I'm right beside you!"))
         .await?;
     Ok(())
 }
@@ -70,30 +74,31 @@ async fn decide(bot: &AutoSend<Bot>, msg: &Message, options: &str) -> Result<()>
             .map(|src| &src.first_name as &str)
             .filter(|s| !s.is_empty())
             .unwrap_or("My friend");
-        bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
+        bot.send_message(msg.chat.id, format!("{title}, what's on your mind?"))
             .await?;
         return Ok(());
     }
     let rand_idx = rand::thread_rng().gen_range(0..options.len());
     let choice = options[rand_idx];
-    bot.send_message(msg.chat_id(), format!("Emmm... I'd say {choice}."))
+    bot.send_message(msg.chat.id, format!("Emmm... I'd say {choice}."))
         .await?;
     Ok(())
 }
 
 async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
-    struct RustV1Release(Date<Utc>);
+    struct RustV1Release(Date);
 
     impl RustV1Release {
         const EPOCH_MINOR: i64 = 5;
-        const DATE_FORMAT: &'static str = "%b %e %Y";
 
-        fn epoch() -> Date<Utc> {
-            Date::from_utc(NaiveDate::from_ymd(2015, 12, 10), Utc)
+        fn epoch() -> Date {
+            static EPOCH: Lazy<Date> =
+                Lazy::new(|| Date::from_calendar_date(2015, Month::December, 10).unwrap());
+            *EPOCH
         }
 
         fn minor(&self) -> i64 {
-            let weeks_since_epoch = self.0.signed_duration_since(Self::epoch()).num_weeks();
+            let weeks_since_epoch = (self.0 - Self::epoch()).whole_weeks();
             if weeks_since_epoch < 0 {
                 return -1;
             }
@@ -101,23 +106,25 @@ async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
             Self::EPOCH_MINOR + new_minors
         }
 
-        fn release_date(&self) -> Date<Utc> {
+        fn release_date(&self) -> Date {
             let new_minors = self.minor() - Self::EPOCH_MINOR;
             Self::epoch() + Duration::weeks(new_minors * 6)
         }
     }
 
     impl Display for RustV1Release {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            static FORMAT: Lazy<Vec<FormatItem>> =
+                Lazy::new(|| format_description::parse("[month repr:short] [day] [year]").unwrap());
             f.write_fmt(format_args!(
                 "Rust v1.{}\t({})",
                 self.minor(),
-                self.release_date().format(Self::DATE_FORMAT),
+                self.release_date().format(&*FORMAT).unwrap(),
             ))
         }
     }
 
-    let now = Utc::now().date();
+    let now = OffsetDateTime::now_utc().date();
     let stable = RustV1Release(now);
     let beta = RustV1Release(now + Duration::weeks(6));
     let nightly = RustV1Release(now + Duration::weeks(2 * 6));
@@ -125,7 +132,7 @@ async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
 
     bot.parse_mode(ParseMode::MarkdownV2)
         .send_message(
-            msg.chat_id(),
+            msg.chat.id,
             format!(
                 indoc! {r#"
                 Oh, I just asked Ferris 🦀️:
@@ -151,7 +158,7 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
             .map(|src| &src.first_name as &str)
             .filter(|s| !s.is_empty())
             .unwrap_or("My friend");
-        bot.send_message(msg.chat_id(), format!("{title}, what's on your mind?"))
+        bot.send_message(msg.chat.id, format!("{title}, what's on your mind?"))
             .await?;
         return Ok(());
     }
@@ -176,7 +183,7 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
     let captures = pat.captures(&resp_txt).filter(|c| c.len() >= 1);
     if captures.is_none() {
         info!("/etymology: Wiktionary extract not found");
-        bot.send_message(msg.chat_id(), "Emmm... Is there really such a word?")
+        bot.send_message(msg.chat.id, "Emmm... Is there really such a word?")
             .await?;
         return Ok(());
     }
@@ -205,7 +212,7 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
     if first_entry.is_empty() {
         info!("/etymology: No etymology entries found");
         bot.send_message(
-            msg.chat_id(),
+            msg.chat.id,
             format!(
                 indoc! {"
                     Let me look it up...
@@ -219,8 +226,8 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
     } else {
         info!("/etymology: Got first entry `{first_entry}`");
         bot.send_message(
-            msg.chat_id(),
-            &format!(
+            msg.chat.id,
+            format!(
                 indoc! {"
                         Let me look it up...
                         
@@ -247,7 +254,7 @@ async fn random_wiki(bot: &AutoSend<Bot>, msg: &Message, mut src: &str) -> Resul
     let url = capture_redir(&endpoint).await?;
 
     bot.send_message(
-        msg.chat_id(),
+        msg.chat.id,
         format!(
             indoc! {"
                 (Paper fluttering...)
