@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 #[allow(clippy::wildcard_imports)]
 use futures::prelude::*;
 use indoc::indoc;
@@ -8,6 +8,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use rand::Rng;
 use regex::Regex;
+use tap::Pipe;
 use teloxide::types::ParseMode;
 #[allow(clippy::wildcard_imports)]
 use teloxide::{prelude2::*, utils::command::BotCommand};
@@ -132,24 +133,24 @@ async fn rust_release(bot: &AutoSend<Bot>, msg: &Message) -> Result<()> {
     let nightly = RustV1Release(now + Duration::weeks(2 * 6));
     let next = RustV1Release(now + Duration::weeks(3 * 6));
 
-    bot.parse_mode(ParseMode::MarkdownV2)
-        .send_message(
-            msg.chat.id,
-            format!(
-                indoc! {r#"
-                Oh, I just asked Ferris 🦀️:
+    format!(
+        indoc! {r#"
+            Oh, I just asked Ferris 🦀️:
 
-                ```
-                stable: {}
-                beta: {}
-                nightly: {}
-                next: {}
-                ```
-            "#},
-                stable, beta, nightly, next,
-            ),
-        )
-        .await?;
+            ```
+            stable: {}
+            beta: {}
+            nightly: {}
+            next: {}
+            ```
+        "#},
+        stable, beta, nightly, next,
+    )
+    .pipe(|txt| {
+        bot.parse_mode(ParseMode::MarkdownV2)
+            .send_message(msg.chat.id, txt)
+    })
+    .await?;
     Ok(())
 }
 
@@ -213,35 +214,31 @@ async fn etymology(bot: &AutoSend<Bot>, msg: &Message, keywords: &str) -> Result
 
     if first_entry.is_empty() {
         info!("/etymology: No etymology entries found");
-        bot.send_message(
-            msg.chat.id,
-            format!(
-                indoc! {"
-                    Let me look it up...
-                    
-                    Oops, it seems that I can't find the etymology in {}...
-                "},
-                source,
-            ),
+        format!(
+            indoc! {"
+                Let me look it up...
+                
+                Oops, it seems that I can't find the etymology in {}...
+            "},
+            source,
         )
+        .pipe(|txt| bot.send_message(msg.chat.id, txt))
         .await?;
     } else {
         info!("/etymology: Got first entry `{first_entry}`");
-        bot.send_message(
-            msg.chat.id,
-            format!(
-                indoc! {"
-                        Let me look it up...
-                        
-                        {}:
+        format!(
+            indoc! {"
+                Let me look it up...
+                
+                {}:
 
-                        {}
+                {}
 
-                        src: {}
-                    "},
-                keywords, first_entry, source,
-            ),
+                src: {}
+            "},
+            keywords, first_entry, source,
         )
+        .pipe(|txt| bot.send_message(msg.chat.id, txt))
         .await?;
     }
     Ok(())
@@ -253,33 +250,50 @@ async fn random_wiki(bot: &AutoSend<Bot>, msg: &Message, mut src: &str) -> Resul
     }
 
     let prefixes = &["wiki/", "title/", ""];
-    let url = Box::pin(stream::iter(prefixes).map(anyhow::Ok).try_filter_map(
-        |prefix| async move {
-            let endpoint = format!("https://{src}/{prefix}Special:Random");
-            let redirected = capture_redir(&endpoint).await?;
-            let url = (endpoint.to_lowercase() != redirected.to_lowercase()).then(|| {
-                info!("/randomwiki: Detected redirection `{endpoint}` -> `{redirected}`");
-                redirected
-            });
-            Ok(url)
-        },
-    ))
-    .try_next()
-    .await?
-    .unwrap_or_else(|| format!("https://{src}/Special:Random"));
-
-    bot.send_message(
-        msg.chat.id,
-        format!(
+    let url = prefixes
+        .iter()
+        .map(|prefix| {
+            async move {
+                let endpoint = format!("https://{src}/{prefix}Special:Random");
+                let redirected = capture_redir(&endpoint).await?;
+                (endpoint.to_lowercase() != redirected.to_lowercase())
+                    .then(|| {
+                        info!("/randomwiki: Detected redirection `{endpoint}` -> `{redirected}`");
+                        redirected
+                    })
+                    .context("no redirection detected")
+            }
+            .pipe(Box::pin)
+        })
+        .pipe(future::select_ok)
+        .await;
+    url.map_or_else(
+        |err| {
+            info!("/randomwiki: Cannot fetch random MediaWiki page: {err}");
             indoc! {"
-                (Paper fluttering...)
-                
-                Here you go!
-                {}
-            "},
-            url,
-        ),
+                Oops... This doesn't seem like a MediaWiki site.
+
+                There are some working examples for you to try, though:
+                en.wiktionary.org
+                en.wikivoyage.org
+                wiki.archlinux.org
+                wiki.haskell.org
+            "}
+            .into()
+        },
+        |(url, _)| {
+            format!(
+                indoc! {"
+                    (Paper fluttering...)
+                    
+                    Here you go!
+                    {}
+                "},
+                url,
+            )
+        },
     )
+    .pipe(|txt| bot.send_message(msg.chat.id, txt))
     .await?;
     Ok(())
 }

@@ -5,13 +5,8 @@ pub fn unescape(s: &str) -> Result<String> {
 }
 
 pub async fn capture_redir(url: &str) -> Result<String> {
-    Ok(reqwest::Client::new()
-        .get(url)
-        .send()
-        .await?
-        .url()
-        .as_str()
-        .into())
+    let response = reqwest::Client::new().get(url).send().await?;
+    Ok(response.url().as_str().into())
 }
 
 pub fn urlencode(s: &str) -> String {
