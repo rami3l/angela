@@ -3,7 +3,10 @@ name = "angela"
 version = ""
 description = ""
 authors = [{ name = "rami3l", email = "rami3l@outlook.com" }]
-dependencies = []
+dependencies = [
+    "python-dotenv>=0.20.0",
+    "aiogram>=2.20",
+]
 requires-python = ">=3.9"
 license = { text = "MIT" }
 [project.optional-dependencies]
@@ -14,9 +17,10 @@ build-backend = "pdm.pep517.api"
 
 [tool.pdm]
 [tool.pdm.dev-dependencies]
-dev = ["black>=22.3.0", "pytest>=7.1.1"]
+dev = ["black>=22.3.0", "pytest>=7.1.1", "jurigged>=0.4.1"]
 
 [tool.pdm.scripts]
 main = "python src/angela/main.py"
 test = "pytest tests/"
 fmt = "black ."
+watch = "jurigged -v src/angela/main.py"
