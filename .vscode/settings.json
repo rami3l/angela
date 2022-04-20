@@ -1,3 +1,11 @@
 {
-  "cSpell.words": ["indoc", "itertools", "redir", "unescaping"]
+  "python.autoComplete.extraPaths": [
+    "__pypackages__/3.9/lib",
+    "__pypackages__/3.10/lib"
+  ],
+  "python.analysis.extraPaths": [
+    "__pypackages__/3.9/lib",
+    "__pypackages__/3.10/lib"
+  ],
+  "FSharp.suggestGitignore": false
 }
