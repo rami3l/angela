@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import logging
 import os
 import random
@@ -9,7 +10,7 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.types.message import Message
 from dotenv import load_dotenv
 
-from angela.utils import RustV1Release
+from angela.utils import RustV1Release, capture_redir
 
 
 def main() -> None:
@@ -43,6 +44,7 @@ def main() -> None:
     dp.message_handler(commands="hello")(hello)
     dp.message_handler(commands="decide")(decide)
     dp.message_handler(commands="rustrelease")(rust_release)
+    dp.message_handler(commands="randomwiki")(random_wiki)
 
     executor.start_polling(dp)
 
@@ -80,6 +82,47 @@ nightly: {nightly}
 next: {next_}
 ```
 """,
+    )
+
+
+async def random_wiki(msg: Message) -> None:
+    src = "commons.wikimedia.org"
+
+    # Try splitting the text into [cmd, src]
+    if len(txt := msg.text.split(maxsplit=1)) == 2:
+        src = txt[1]
+
+    prefixes = ["wiki/", "title/", ""]
+
+    async def handle_prefix(prefix):
+        endpoint = f"https://{src}/{prefix}Special:Random"
+        return await capture_redir(endpoint)
+
+    redirs = await asyncio.gather(*[handle_prefix(prefix) for prefix in prefixes])
+    redir = next((r for r in redirs if r), None)
+
+    if not redir:
+        logging.info(f"/randomwiki: Cannot fetch random MediaWiki page at `{src}`")
+        await msg.reply(
+            """\
+🤔 Oops... This doesn't seem like a MediaWiki site.
+
+There are some working examples for you to try, though:
+en.wiktionary.org
+en.wikivoyage.org
+wiki.archlinux.org
+wiki.haskell.org
+"""
+        )
+        return
+
+    await msg.reply(
+        f"""\
+📖 (Paper fluttering...)
+                    
+Here you go!
+{redir}
+"""
     )
 
 

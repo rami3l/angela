@@ -28,6 +28,5 @@ def test_urlencode():
 
 @pytest.mark.asyncio
 async def test_capture_redir():
-    url = "https://duck.com/"
-    got = await capture_redir(url)
-    assert got == "https://duckduckgo.com/"
+    assert await capture_redir("https://duck.com/") == "https://duckduckgo.com/"
+    assert await capture_redir("https://duckduckgo.com/") is None

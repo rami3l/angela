@@ -23,7 +23,7 @@ async def capture_redir(url: str) -> Optional[str]:
     async with aiohttp.ClientSession() as session, session.get(
         url, ssl=SSL_CTX
     ) as resp:
-        return str(resp.url)
+        return redir if (redir := str(resp.url)).lower() != url.lower() else None
 
 
 @dataclass
