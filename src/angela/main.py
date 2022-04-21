@@ -3,14 +3,16 @@ import asyncio
 import logging
 import os
 import random
+import textwrap
 from datetime import date, datetime
 
 import coloredlogs
+import wiktionaryparser as wiktionary
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types.message import Message
 from dotenv import load_dotenv
 
-from angela.utils import RustV1Release, capture_redir
+from angela.utils import RustV1Release, capture_redir, urlencode
 
 
 def main() -> None:
@@ -41,12 +43,19 @@ def main() -> None:
     bot = Bot(token=opts.token)
     dp = Dispatcher(bot)
 
+    dp.message_handler(commands="help")(help)
     dp.message_handler(commands="hello")(hello)
     dp.message_handler(commands="decide")(decide)
     dp.message_handler(commands="rustrelease")(rust_release)
     dp.message_handler(commands="randomwiki")(random_wiki)
+    dp.message_handler(commands="etymology")(etymology)
 
     executor.start_polling(dp)
+
+
+async def help(msg: Message) -> None:
+    title = (src := msg.from_user) and src.first_name or "Hi"
+    await msg.reply(f"🤔 {title}, what's on your mind?")
 
 
 async def hello(msg: Message) -> None:
@@ -55,12 +64,11 @@ async def hello(msg: Message) -> None:
 
 
 async def decide(msg: Message) -> None:
-    formats = ["🤔 Emmm... I'd say {}.", "💡 What about {}?"]
     options = msg.text.split()[1:]
     if not options:
-        title = (src := msg.from_user) and src.first_name or "Hi"
-        await msg.reply(f"🤔 {title}, what's on your mind?")
+        await help(msg)
         return
+    formats = ["🤔 Emmm... I'd say {}.", "💡 What about {}?"]
     await msg.reply(random.choice(formats).format(random.choice(options)))
 
 
@@ -73,15 +81,17 @@ async def rust_release(msg: Message) -> None:
 
     await msg.reply(
         parse_mode="MarkdownV2",
-        text=f"""\
-Oh, I just asked Ferris 🦀️:
-```
-stable: {stable}
-beta: {beta}
-nightly: {nightly}
-next: {next_}
-```
-""",
+        text=textwrap.dedent(
+            f"""\
+            Oh, I just asked Ferris 🦀️:
+            ```
+            stable: {stable}
+            beta: {beta}
+            nightly: {nightly}
+            next: {next_}
+            ```
+            """
+        ),
     )
 
 
@@ -104,25 +114,55 @@ async def random_wiki(msg: Message) -> None:
     if not redir:
         logging.info(f"/randomwiki: Cannot fetch random MediaWiki page at `{src}`")
         await msg.reply(
-            """\
-🤔 Oops... This doesn't seem like a MediaWiki site.
+            textwrap.dedent(
+                """\
+                🤔 Oops... This doesn't seem like a MediaWiki site.
 
-There are some working examples for you to try, though:
-en.wiktionary.org
-en.wikivoyage.org
-wiki.archlinux.org
-wiki.haskell.org
-"""
+                There are some working examples for you to try, though:
+                en.wiktionary.org
+                en.wikivoyage.org
+                wiki.archlinux.org
+                wiki.haskell.org
+                """
+            )
         )
         return
 
     await msg.reply(
-        f"""\
-📖 (Paper fluttering...)
-                    
-Here you go!
-{redir}
-"""
+        textwrap.dedent(
+            f"""\
+            📖 (Paper fluttering...)
+                                
+            Here you go!
+            {redir}
+            """
+        )
+    )
+
+
+async def etymology(msg: Message) -> None:
+    if len(txt := msg.text.split(maxsplit=1)) != 2:
+        await help(msg)
+        return
+    kw = txt[1]
+    lang = "English"
+    if kw.startswith("%"):
+        if len(txt := kw.split(maxsplit=1)) != 2:
+            await help(msg)
+            return
+        [lang, kw] = txt
+        lang = lang[1:]
+
+    parser = wiktionary.WiktionaryParser()
+    parser.set_default_language(lang)
+    data = parser.fetch(kw)
+    etys = enumerate(i["etymology"] for i in data)
+    src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
+    etys_str = "\n".join(f"{i+1}. {ety}" for (i, ety) in etys).strip()
+    if not etys_str or etys_str == "1.":
+        etys_str = f"(Oops, 404 NOT FOUND 🤷‍♀️)"
+    await msg.reply(
+        "\n\n".join(["🧐 Let me look it up...", f"{kw}:", etys_str, f"src: {src}"])
     )
 
 
