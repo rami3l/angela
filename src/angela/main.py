@@ -158,7 +158,7 @@ async def etymology(msg: Message) -> None:
     data = parser.fetch(kw)
     etys = enumerate(i["etymology"] for i in data)
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
-    etys_str = "\n".join(f"{i+1}. {ety}" for (i, ety) in etys).strip()
+    etys_str = "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in etys if ety)
     if not etys_str or etys_str == "1.":
         etys_str = f"(Oops, 404 NOT FOUND 🤷‍♀️)"
     await msg.reply(
