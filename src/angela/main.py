@@ -155,11 +155,12 @@ async def etymology(msg: Message) -> None:
 
     parser = wiktionary.WiktionaryParser()
     parser.set_default_language(lang)
-    data = parser.fetch(kw)
+    # `parser.fetch()` operation is blocking, so we need to launch it in the async context.
+    data = await asyncio.create_task(asyncio.to_thread(lambda: parser.fetch(kw)))
     etys = enumerate(i["etymology"] for i in data)
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
     etys_str = "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in etys if ety)
-    if not etys_str or etys_str == "1.":
+    if not etys_str:
         etys_str = f"(Oops, 404 NOT FOUND 🤷‍♀️)"
     await msg.reply(
         "\n\n".join(["🧐 Let me look it up...", f"{kw}:", etys_str, f"src: {src}"])
