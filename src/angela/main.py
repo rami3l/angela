@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 
 from angela.utils import RustV1Release, capture_redir, urlencode
 
+CMD_OPTION_PREFIX = "%"
+
 
 def main() -> None:
     load_dotenv()
@@ -97,15 +99,24 @@ async def rust_release(msg: Message) -> None:
 
 async def random_wiki(msg: Message) -> None:
     src = "commons.wikimedia.org"
+    category = None
 
     # Try splitting the text into [cmd, src]
     if len(txt := msg.text.split(maxsplit=1)) == 2:
         src = txt[1]
+    if src.startswith(CMD_OPTION_PREFIX) and len(txt := src.split(maxsplit=1)) == 2:
+        [category, src] = txt
+        category = category.lstrip(CMD_OPTION_PREFIX)
 
     prefixes = ["wiki/", "title/", ""]
+    suffix = (
+        f"Special:RandomInCategory/{urlencode(category)}"
+        if category
+        else "Special:Random"
+    )
 
     async def handle_prefix(prefix):
-        endpoint = f"https://{src}/{prefix}Special:Random"
+        endpoint = f"https://{src}/{prefix}{suffix}"
         return await capture_redir(endpoint)
 
     redirs = await asyncio.gather(*[handle_prefix(prefix) for prefix in prefixes])
@@ -146,12 +157,12 @@ async def etymology(msg: Message) -> None:
         return
     kw = txt[1]
     lang = "English"
-    if kw.startswith("%"):
+    if kw.startswith(CMD_OPTION_PREFIX):
         if len(txt := kw.split(maxsplit=1)) != 2:
             await help(msg)
             return
         [lang, kw] = txt
-        lang = lang[1:]
+        lang = lang.lstrip(CMD_OPTION_PREFIX)
 
     parser = wiktionary.WiktionaryParser()
     parser.set_default_language(lang)
