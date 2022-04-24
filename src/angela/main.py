@@ -42,8 +42,7 @@ def main() -> None:
 
     logging.warning("Angela is waking up...")
 
-    bot = Bot(token=opts.token)
-    dp = Dispatcher(bot)
+    dp = Dispatcher(Bot(token=opts.token))
 
     dp.message_handler(commands="help")(help)
     dp.message_handler(commands="hello")(hello)
@@ -76,10 +75,9 @@ async def decide(msg: Message) -> None:
 
 async def rust_release(msg: Message) -> None:
     now: date = datetime.utcnow().date()
-    stable = RustV1Release(now)
-    beta = RustV1Release(now + RustV1Release.RELEASE_PERIOD)
-    nightly = RustV1Release(now + 2 * RustV1Release.RELEASE_PERIOD)
-    next_ = RustV1Release(now + 3 * RustV1Release.RELEASE_PERIOD)
+    [stable, beta, nightly, next_] = [
+        RustV1Release(now + i * RustV1Release.RELEASE_PERIOD) for i in range(4)
+    ]
 
     await msg.reply(
         parse_mode="MarkdownV2",
@@ -119,8 +117,8 @@ async def random_wiki(msg: Message) -> None:
         endpoint = f"https://{src}/{prefix}{suffix}"
         return await capture_redir(endpoint)
 
-    redirs = await asyncio.gather(*[handle_prefix(prefix) for prefix in prefixes])
-    redir = next((r for r in redirs if r), None)
+    redirs = await asyncio.gather(*map(handle_prefix, prefixes))
+    redir = next(filter(None, redirs), None)
 
     if not redir:
         logging.info(f"/randomwiki: Cannot fetch random MediaWiki page at `{src}`")
@@ -168,11 +166,12 @@ async def etymology(msg: Message) -> None:
     parser.set_default_language(lang)
     # `parser.fetch()` operation is blocking, so we need to launch it in the async context.
     data = await asyncio.create_task(asyncio.to_thread(lambda: parser.fetch(kw)))
-    etys = enumerate(i["etymology"] for i in data)
+    etys = (i["etymology"] for i in data)
+    etys_str = (
+        "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in enumerate(etys) if ety)
+        or f"(Oops, 404 NOT FOUND 🤷‍♀️)"
+    )
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
-    etys_str = "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in etys if ety)
-    if not etys_str:
-        etys_str = f"(Oops, 404 NOT FOUND 🤷‍♀️)"
     await msg.reply(
         "\n\n".join(["🧐 Let me look it up...", f"{kw}:", etys_str, f"src: {src}"])
     )
