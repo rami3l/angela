@@ -32,7 +32,7 @@ dev = [
 ]
 
 [tool.pdm.scripts]
-main = "python src/angela/main.py"
+main = "python -m angela"
 test = "pytest tests/"
 fmt = "black ."
-watch = "jurigged -v src/angela/main.py"
+watch = "jurigged -m angela"
