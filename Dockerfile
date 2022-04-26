@@ -26,4 +26,4 @@ ENV PYTHONPATH=/${APP_NAME}/pkgs
 COPY --from=angela-builder /${APP_NAME}/__pypackages__/3.10/lib /${APP_NAME}/pkgs
 
 # set command/entrypoint, adapt to fit your needs
-CMD python -m ${APP_NAME}.main
+CMD python -m ${APP_NAME}
