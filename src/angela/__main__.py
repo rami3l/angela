@@ -141,7 +141,7 @@ async def random_wiki(msg: Message) -> None:
         textwrap.dedent(
             f"""\
             📖 (Paper fluttering...)
-                                
+
             Here you go!
             {redir}
             """
@@ -164,12 +164,13 @@ async def etymology(msg: Message) -> None:
 
     parser = wiktionary.WiktionaryParser()
     parser.set_default_language(lang)
-    # `parser.fetch()` operation is blocking, so we need to launch it in the async context.
+    # `parser.fetch()` operation is blocking, so we need to launch it in the async
+    # context.
     data = await asyncio.create_task(asyncio.to_thread(lambda: parser.fetch(kw)))
     etys = (i["etymology"] for i in data)
     etys_str = (
         "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in enumerate(etys) if ety)
-        or f"(Oops, 404 NOT FOUND 🤷‍♀️)"
+        or "(Oops, 404 NOT FOUND 🤷‍♀️)"
     )
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
     await msg.reply(
