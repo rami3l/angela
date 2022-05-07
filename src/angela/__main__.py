@@ -10,6 +10,7 @@ import coloredlogs
 import wiktionaryparser as wiktionary
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types.message import Message
+from aiohttp import ClientConnectorError
 from dotenv import load_dotenv
 
 from angela.utils import RustV1Release, capture_redir, urlencode
@@ -96,7 +97,16 @@ async def rust_release(msg: Message) -> None:
 
 
 async def random_wiki(msg: Message) -> None:
-    src = "commons.wikimedia.org"
+    srcs = [
+        "en.wikipedia.org",
+        "en.wikisource.org",
+        "en.wiktionary.org",
+        "en.wikivoyage.org",
+        "commons.wikimedia.org",
+        "wiki.archlinux.org",
+        "wiki.haskell.org",
+    ]
+    src = random.choice(srcs)
     category = None
 
     # Try splitting the text into [cmd, src]
@@ -117,23 +127,20 @@ async def random_wiki(msg: Message) -> None:
         endpoint = f"https://{src}/{prefix}{suffix}"
         return await capture_redir(endpoint)
 
-    redirs = await asyncio.gather(*map(handle_prefix, prefixes))
-    redir = next(filter(None, redirs), None)
-
-    if not redir:
+    try:
+        redirs = await asyncio.gather(*map(handle_prefix, prefixes))
+        redir: str = next(filter(None, redirs))
+    except (StopIteration, ClientConnectorError):
         logging.info(f"/randomwiki: Cannot fetch random MediaWiki page at `{src}`")
         await msg.reply(
             textwrap.dedent(
                 """\
-                🤔 Oops... This doesn't seem like a MediaWiki site.
+                🤔 Oops, this doesn't seem like a MediaWiki site...
 
-                There are some working examples for you to try, though:
-                en.wiktionary.org
-                en.wikivoyage.org
-                wiki.archlinux.org
-                wiki.haskell.org
+                💡 There are some working examples for you to try, though:
                 """
             )
+            + "\n".join(srcs)
         )
         return
 
