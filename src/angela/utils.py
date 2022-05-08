@@ -17,6 +17,7 @@ def unescape(s: str) -> str:
 
 
 urlencode = urllib.parse.quote_plus
+urldecode = urllib.parse.unquote
 
 
 async def capture_redir(url: str) -> Optional[str]:

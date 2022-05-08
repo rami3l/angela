@@ -5,6 +5,7 @@ import os
 import random
 import textwrap
 from datetime import date, datetime
+from urllib.parse import urlparse
 
 import coloredlogs
 import wiktionaryparser as wiktionary
@@ -13,7 +14,7 @@ from aiogram.types.message import Message
 from aiohttp import ClientConnectorError
 from dotenv import load_dotenv
 
-from angela.utils import RustV1Release, capture_redir, urlencode
+from angela.utils import RustV1Release, capture_redir, urldecode, urlencode
 
 CMD_OPTION_PREFIX = "%"
 
@@ -102,6 +103,7 @@ async def random_wiki(msg: Message) -> None:
         "en.wikisource.org",
         "en.wiktionary.org",
         "en.wikivoyage.org",
+        "en.wikibooks.org",
         "commons.wikimedia.org",
         "wiki.archlinux.org",
         "wiki.haskell.org",
@@ -144,12 +146,18 @@ async def random_wiki(msg: Message) -> None:
         )
         return
 
+    title = urlparse(redir).path.removeprefix("/")
+    for prefix in filter(None, prefixes):
+        title = title.removeprefix(prefix)
+    title = urldecode(title)
+
     await msg.reply(
         textwrap.dedent(
             f"""\
             📖 (Paper fluttering...)
-
             Here you go!
+
+            "{title}":
             {redir}
             """
         )
