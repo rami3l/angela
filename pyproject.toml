@@ -36,3 +36,10 @@ main = "python -m angela"
 test = "pytest tests/"
 fmt = "black ."
 watch = "jurigged -m angela"
+
+[tool.flake8]
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 88
+# See https://github.com/PyCQA/pycodestyle/issues/373
+extend-ignore = "E203"
