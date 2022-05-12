@@ -8,6 +8,7 @@ from datetime import date, datetime
 from urllib.parse import urlparse
 
 import coloredlogs
+import duckduckgo
 import wiktionaryparser as wiktionary
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types.message import Message
@@ -46,12 +47,13 @@ def main() -> None:
 
     dp = Dispatcher(Bot(token=opts.token))
 
-    dp.message_handler(commands="help")(help)
-    dp.message_handler(commands="hello")(hello)
+    dp.message_handler(commands="ddg")(ddg)
     dp.message_handler(commands="decide")(decide)
-    dp.message_handler(commands="rustrelease")(rust_release)
-    dp.message_handler(commands="randomwiki")(random_wiki)
     dp.message_handler(commands="etymology")(etymology)
+    dp.message_handler(commands="hello")(hello)
+    dp.message_handler(commands="help")(help)
+    dp.message_handler(commands="randomwiki")(random_wiki)
+    dp.message_handler(commands="rustrelease")(rust_release)
 
     executor.start_polling(dp)
 
@@ -64,6 +66,23 @@ async def help(msg: Message) -> None:
 async def hello(msg: Message) -> None:
     title = (src := msg.from_user) and src.first_name or "Hi"
     await msg.reply(f"👋 {title}, I'm right beside you!")
+
+
+async def ddg(msg: Message) -> None:
+    if len(txt := msg.text.split(maxsplit=1)) != 2:
+        await help(msg)
+        return
+    kw = txt[1]
+    res = await asyncio.create_task(asyncio.to_thread(lambda: duckduckgo.get_zci(kw)))
+    await msg.reply(
+        textwrap.dedent(
+            f"""\
+            🦆 Quack! Quack!
+
+            {res}
+            """
+        )
+    )
 
 
 async def decide(msg: Message) -> None:
