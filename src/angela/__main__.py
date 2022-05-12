@@ -73,7 +73,7 @@ async def ddg(msg: Message) -> None:
         await help(msg)
         return
     kw = txt[1]
-    res = await asyncio.create_task(asyncio.to_thread(lambda: duckduckgo.get_zci(kw)))
+    res = await asyncio.to_thread(lambda: duckduckgo.get_zci(kw))
     await msg.reply(
         textwrap.dedent(
             f"""\
@@ -200,7 +200,7 @@ async def etymology(msg: Message) -> None:
     parser.set_default_language(lang)
     # `parser.fetch()` operation is blocking, so we need to launch it in the async
     # context.
-    data = await asyncio.create_task(asyncio.to_thread(lambda: parser.fetch(kw)))
+    data = await asyncio.to_thread(lambda: parser.fetch(kw))
     etys = (i["etymology"] for i in data)
     etys_str = (
         "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in enumerate(etys) if ety)
