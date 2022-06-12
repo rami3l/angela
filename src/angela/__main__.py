@@ -9,6 +9,8 @@ from urllib.parse import urlparse
 
 import coloredlogs
 import duckduckgo
+import iso639
+import langdetect
 import wiktionaryparser as wiktionary
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types.message import Message
@@ -197,13 +199,16 @@ async def etymology(msg: Message) -> None:
         await help(msg)
         return
     kw = txt[1]
-    lang = "English"
+
     if kw.startswith(CMD_OPTION_PREFIX):
         if len(txt := kw.split(maxsplit=1)) != 2:
             await help(msg)
             return
         [lang, kw] = txt
         lang = lang.lstrip(CMD_OPTION_PREFIX)
+    else:
+        lang = langdetect.detect(kw)
+    lang = iso639.Lang(lang).name
 
     parser = wiktionary.WiktionaryParser()
     parser.set_default_language(lang)

@@ -12,6 +12,8 @@ dependencies = [
     "certifi>=2021.10.8",
     "wiktionaryparser>=0.0.97",
     "duckduckgo3>=0.242",
+    "iso639-lang>=2.0.1",
+    "langdetect>=1.0.9",
 ]
 requires-python = ">=3.9"
 license = { text = "MIT" }

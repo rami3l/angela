@@ -172,6 +172,12 @@ version = "1.1.1"
 summary = "iniconfig: brain-dead simple config-ini parsing"
 
 [[package]]
+name = "iso639-lang"
+version = "2.0.1"
+requires_python = ">=3.6"
+summary = "A lightweight library for the ISO 639 standard."
+
+[[package]]
 name = "jinxed"
 version = "1.2.0"
 summary = "Jinxed Terminal Library"
@@ -189,6 +195,14 @@ dependencies = [
     "codefind<0.2.0,>=0.1.3",
     "ovld<0.4.0,>=0.3.1",
     "watchdog>=1.0.2",
+]
+
+[[package]]
+name = "langdetect"
+version = "1.0.9"
+summary = "Language detection library ported from Google's language-detection."
+dependencies = [
+    "six",
 ]
 
 [[package]]
@@ -394,7 +408,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:8fe93524f816eaa00bcb88a70622755f211b66ebb5411b40cd2a3d8b24fabad7"
+content_hash = "sha256:b1fcbd1066d629178bf8ac514d5ea8201346e769b57be18e85e0c092b256a46f"
 
 [metadata.files]
 "aiogram 2.20" = [
@@ -633,6 +647,10 @@ content_hash = "sha256:8fe93524f816eaa00bcb88a70622755f211b66ebb5411b40cd2a3d8b2
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
+"iso639-lang 2.0.1" = [
+    {file = "iso639_lang-2.0.1-py3-none-any.whl", hash = "sha256:8822550ef961e1f3ab66e1d0a9ac04dc9680e054a84cdafbfbbe228e6c48e919"},
+    {file = "iso639-lang-2.0.1.tar.gz", hash = "sha256:f79e8bc3b6c2a85cc393bd8fba6011c73dac9c79db065bd654cbf80e58be0f46"},
+]
 "jinxed 1.2.0" = [
     {file = "jinxed-1.2.0-py2.py3-none-any.whl", hash = "sha256:cfc2b2e4e3b4326954d546ba6d6b9a7a796ddcb0aef8d03161d005177eb0d48b"},
     {file = "jinxed-1.2.0.tar.gz", hash = "sha256:032acda92d5c57cd216033cbbd53de731e6ed50deb63eb4781336ca55f72cda5"},
@@ -640,6 +658,10 @@ content_hash = "sha256:8fe93524f816eaa00bcb88a70622755f211b66ebb5411b40cd2a3d8b2
 "jurigged 0.5.1" = [
     {file = "jurigged-0.5.1-py3-none-any.whl", hash = "sha256:eee3e68ca66fa9b305405a90fc9a6ab5218af13b46be48415775d254df4a1815"},
     {file = "jurigged-0.5.1.tar.gz", hash = "sha256:390db5122f826ce6539ba15331b994d156b7328d8be76753049110d0f2c18a68"},
+]
+"langdetect 1.0.9" = [
+    {file = "langdetect-1.0.9-py2-none-any.whl", hash = "sha256:7cbc0746252f19e76f77c0b1690aadf01963be835ef0cd4b56dddf2a8f1dfc2a"},
+    {file = "langdetect-1.0.9.tar.gz", hash = "sha256:cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0"},
 ]
 "multidict 6.0.2" = [
     {file = "multidict-6.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:0b9e95a740109c6047602f4db4da9949e6c5945cefbad34a1299775ddc9a62e2"},
