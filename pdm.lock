@@ -172,6 +172,12 @@ version = "1.1.1"
 summary = "iniconfig: brain-dead simple config-ini parsing"
 
 [[package]]
+name = "iso639-lang"
+version = "2.0.1"
+requires_python = ">=3.6"
+summary = "A lightweight library for the ISO 639 standard."
+
+[[package]]
 name = "jinxed"
 version = "1.2.0"
 summary = "Jinxed Terminal Library"
@@ -394,7 +400,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:8fe93524f816eaa00bcb88a70622755f211b66ebb5411b40cd2a3d8b24fabad7"
+content_hash = "sha256:3f72dbbc165f6b210b57e448c4865a3b3a541bc357f5d47ccd2b02b85e6376a0"
 
 [metadata.files]
 "aiogram 2.20" = [
@@ -632,6 +638,10 @@ content_hash = "sha256:8fe93524f816eaa00bcb88a70622755f211b66ebb5411b40cd2a3d8b2
 "iniconfig 1.1.1" = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
+]
+"iso639-lang 2.0.1" = [
+    {file = "iso639_lang-2.0.1-py3-none-any.whl", hash = "sha256:8822550ef961e1f3ab66e1d0a9ac04dc9680e054a84cdafbfbbe228e6c48e919"},
+    {file = "iso639-lang-2.0.1.tar.gz", hash = "sha256:f79e8bc3b6c2a85cc393bd8fba6011c73dac9c79db065bd654cbf80e58be0f46"},
 ]
 "jinxed 1.2.0" = [
     {file = "jinxed-1.2.0-py2.py3-none-any.whl", hash = "sha256:cfc2b2e4e3b4326954d546ba6d6b9a7a796ddcb0aef8d03161d005177eb0d48b"},
