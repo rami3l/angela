@@ -198,6 +198,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "langdetect"
+version = "1.0.9"
+summary = "Language detection library ported from Google's language-detection."
+dependencies = [
+    "six",
+]
+
+[[package]]
 name = "multidict"
 version = "6.0.2"
 requires_python = ">=3.7"
@@ -400,7 +408,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:3f72dbbc165f6b210b57e448c4865a3b3a541bc357f5d47ccd2b02b85e6376a0"
+content_hash = "sha256:b1fcbd1066d629178bf8ac514d5ea8201346e769b57be18e85e0c092b256a46f"
 
 [metadata.files]
 "aiogram 2.20" = [
@@ -650,6 +658,10 @@ content_hash = "sha256:3f72dbbc165f6b210b57e448c4865a3b3a541bc357f5d47ccd2b02b85
 "jurigged 0.5.1" = [
     {file = "jurigged-0.5.1-py3-none-any.whl", hash = "sha256:eee3e68ca66fa9b305405a90fc9a6ab5218af13b46be48415775d254df4a1815"},
     {file = "jurigged-0.5.1.tar.gz", hash = "sha256:390db5122f826ce6539ba15331b994d156b7328d8be76753049110d0f2c18a68"},
+]
+"langdetect 1.0.9" = [
+    {file = "langdetect-1.0.9-py2-none-any.whl", hash = "sha256:7cbc0746252f19e76f77c0b1690aadf01963be835ef0cd4b56dddf2a8f1dfc2a"},
+    {file = "langdetect-1.0.9.tar.gz", hash = "sha256:cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0"},
 ]
 "multidict 6.0.2" = [
     {file = "multidict-6.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:0b9e95a740109c6047602f4db4da9949e6c5945cefbad34a1299775ddc9a62e2"},
