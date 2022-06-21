@@ -207,8 +207,9 @@ async def etymology(msg: Message) -> None:
         [lang, kw] = txt
         lang = lang.lstrip(CMD_OPTION_PREFIX)
     else:
-        lang = langdetect.detect(kw)
+        lang = langdetect.detect(kw).split("-", maxsplit=1)[0]
     lang = iso639.Lang(lang).name
+    logging.info(f"/etymology: Querying `{kw}` in {lang}")
 
     async def query(lang: str, kw: str) -> str:
         parser = wiktionary.WiktionaryParser()
