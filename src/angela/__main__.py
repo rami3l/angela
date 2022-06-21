@@ -210,16 +210,25 @@ async def etymology(msg: Message) -> None:
         lang = langdetect.detect(kw)
     lang = iso639.Lang(lang).name
 
-    parser = wiktionary.WiktionaryParser()
-    parser.set_default_language(lang)
-    # `parser.fetch()` operation is blocking, so we need to launch it in the async
-    # context.
-    data = await asyncio.to_thread(lambda: parser.fetch(kw))
-    etys = (i["etymology"] for i in data)
+    async def query(lang: str, kw: str) -> str:
+        parser = wiktionary.WiktionaryParser()
+        parser.set_default_language(lang)
+        # `parser.fetch()` operation is blocking, so we need to launch it in the async
+        # context.
+        data = await asyncio.to_thread(lambda: parser.fetch(kw))
+        etys = (i["etymology"] for i in data)
+        return "\n\n".join(
+            f"{i+1}. {ety.strip()}" for (i, ety) in enumerate(etys) if ety
+        )
+
+    if not (etys_str := await query(lang, kw)) and lang != "English":
+        # Retry once with English.
+        etys_str = await query("English", kw)
+
     etys_str = (
-        "\n\n".join(f"{i+1}. {ety.strip()}" for (i, ety) in enumerate(etys) if ety)
-        or "(Oops, 404 NOT FOUND 🤷‍♀️)"
+        etys_str or f"😯 Oops, 404 NOT FOUND! (It seems like {lang} to me, though.)"
     )
+
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
     await msg.reply(
         "\n\n".join(["🧐 Let me look it up...", f"{kw}:", etys_str, f"src: {src}"])
