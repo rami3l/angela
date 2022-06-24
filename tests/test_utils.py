@@ -20,9 +20,14 @@ Rhymes: -aʊ\
     assert unescape(original) == expected
 
 
-def test_urlencode_urldecode():
-    decoded = "春眠暁を覚えず"
-    encoded = r"%E6%98%A5%E7%9C%A0%E6%9A%81%E3%82%92%E8%A6%9A%E3%81%88%E3%81%9A"
+@pytest.mark.parametrize(
+    "decoded,encoded",
+    [
+        ("春眠暁を覚えず", r"%E6%98%A5%E7%9C%A0%E6%9A%81%E3%82%92%E8%A6%9A%E3%81%88%E3%81%9A"),
+        ("/El Niño/", r"%2FEl%20Ni%C3%B1o%2F"),
+    ],
+)
+def test_urlencode_urldecode(decoded: str, encoded: str):
     assert urlencode(decoded) == encoded
     assert decoded == urldecode(encoded)
 

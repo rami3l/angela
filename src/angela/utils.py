@@ -1,3 +1,4 @@
+import functools
 import json
 import ssl
 import urllib.parse
@@ -16,7 +17,7 @@ def unescape(s: str) -> str:
     return json.loads(f'"{s}"')
 
 
-urlencode = urllib.parse.quote_plus
+urlencode = functools.partial(urllib.parse.quote, safe="")
 urldecode = urllib.parse.unquote
 
 
