@@ -5,6 +5,7 @@ import os
 import random
 import textwrap
 from datetime import date, datetime
+from typing import get_args
 from urllib.parse import urlparse
 
 import coloredlogs
@@ -71,10 +72,9 @@ async def hello(msg: Message) -> None:
 
 
 async def ddg(msg: Message) -> None:
-    if len(txt := msg.text.split(maxsplit=1)) != 2:
+    if not (kw := msg.get_args()):
         await help(msg)
         return
-    kw = txt[1]
     res = await asyncio.to_thread(lambda: duckduckgo.get_zci(kw))
     await msg.reply(
         textwrap.dedent(
@@ -88,8 +88,7 @@ async def ddg(msg: Message) -> None:
 
 
 async def decide(msg: Message) -> None:
-    options = msg.text.split()[1:]
-    if not options:
+    if not (options := msg.get_args().split()):
         await help(msg)
         return
     formats = ["🤔 Emmm... I'd say {}.", "💡 What about {}?"]
@@ -138,15 +137,20 @@ async def random_wiki(msg: Message) -> None:
         "wiki.archlinux.org",
         "wiki.haskell.org",
     ]
-    src = random.choice(srcs)
-    category = None
 
-    # Try splitting the text into [cmd, src]
-    if len(txt := msg.text.split(maxsplit=1)) == 2:
-        src = txt[1]
-    if src.startswith(CMD_OPTION_PREFIX) and len(txt := src.split(maxsplit=1)) == 2:
-        [category, src] = txt
+    args = msg.get_args().split()[:2]
+
+    # TODO: Use match-case in Python 3.10+.
+    if (len_ := len(args)) == 2:
+        [category, src] = args
         category = category.lstrip(CMD_OPTION_PREFIX)
+    elif len_ == 1:
+        src = args[0] or random.choice(srcs)
+        category = None
+    else:
+        # len_ == 0
+        await help(msg)
+        return
 
     prefixes = ["wiki/", "title/", ""]
     suffix = (
@@ -195,19 +199,19 @@ async def random_wiki(msg: Message) -> None:
 
 
 async def etymology(msg: Message) -> None:
-    if len(txt := msg.text.split(maxsplit=1)) != 2:
+    args = msg.get_args().split(maxsplit=1)
+
+    # TODO: Use match-case in Python 3.10+.
+    if (len_ := len(args)) == 2:
+        [lang, kw] = args
+        lang = lang.lstrip(CMD_OPTION_PREFIX)
+    elif len_ == 1:
+        lang = langdetect.detect(args[0]).split("-", maxsplit=1)[0]
+    else:
+        # len_ == 0
         await help(msg)
         return
-    kw = txt[1]
 
-    if kw.startswith(CMD_OPTION_PREFIX):
-        if len(txt := kw.split(maxsplit=1)) != 2:
-            await help(msg)
-            return
-        [lang, kw] = txt
-        lang = lang.lstrip(CMD_OPTION_PREFIX)
-    else:
-        lang = langdetect.detect(kw).split("-", maxsplit=1)[0]
     lang = iso639.Lang(lang).name
     logging.info(f"/etymology: Querying `{kw}` in {lang}")
 
