@@ -60,7 +60,7 @@ def main() -> None:
         "rust_release",
     ]
     for cmd in cmds:
-        handler = log_err(locals()[cmd])
+        handler = log_err(locals()[cmd])  # * Dynamic magic!
         dp.message_handler(commands=cmd.replace("_", ""))(handler)
 
     executor.start_polling(dp)
