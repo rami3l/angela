@@ -5,7 +5,7 @@ import os
 import random
 import textwrap
 from datetime import date, datetime
-from typing import get_args
+from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
 import coloredlogs
@@ -50,15 +50,33 @@ def main() -> None:
 
     dp = Dispatcher(Bot(token=opts.token))
 
-    dp.message_handler(commands="ddg")(ddg)
-    dp.message_handler(commands="decide")(decide)
-    dp.message_handler(commands="etymology")(etymology)
-    dp.message_handler(commands="hello")(hello)
-    dp.message_handler(commands="help")(help)
-    dp.message_handler(commands="randomwiki")(random_wiki)
-    dp.message_handler(commands="rustrelease")(rust_release)
+    cmds = [
+        "ddg",
+        "decide",
+        "etymology",
+        "hello",
+        "help",
+        "random_wiki",
+        "rust_release",
+    ]
+    for cmd in cmds:
+        handler = log_err(locals()[cmd])
+        dp.message_handler(commands=cmd.replace("_", ""))(handler)
 
     executor.start_polling(dp)
+
+
+def log_err(
+    f: Callable[[Message], Awaitable[None]]
+) -> Callable[[Message], Awaitable[None]]:
+    async def f1(msg: Message) -> None:
+        try:
+            await f(msg)
+        except Exception as e:
+            logging.error(f"{f.__name__}: {e}")
+            await msg.reply(f"🤯 Oops, an error occurred!\n\n{e}")
+
+    return f1
 
 
 async def help(msg: Message) -> None:
@@ -141,16 +159,12 @@ async def random_wiki(msg: Message) -> None:
     args = msg.get_args().split()[:2]
 
     # TODO: Use match-case in Python 3.10+.
-    if (len_ := len(args)) == 2:
-        [category, src] = args
+    if len(args) == 2:
+        [src, category] = args
         category = category.lstrip(CMD_OPTION_PREFIX)
-    elif len_ == 1:
-        src = args[0] or random.choice(srcs)
-        category = None
     else:
-        # len_ == 0
-        await help(msg)
-        return
+        src = args[0] if args else random.choice(srcs)
+        category = None
 
     prefixes = ["wiki/", "title/", ""]
     suffix = (
@@ -198,19 +212,20 @@ async def random_wiki(msg: Message) -> None:
     )
 
 
+@log_err
 async def etymology(msg: Message) -> None:
-    args = msg.get_args().split(maxsplit=1)
-
-    # TODO: Use match-case in Python 3.10+.
-    if (len_ := len(args)) == 2:
-        [lang, kw] = args
-        lang = lang.lstrip(CMD_OPTION_PREFIX)
-    elif len_ == 1:
-        lang = langdetect.detect(args[0]).split("-", maxsplit=1)[0]
-    else:
-        # len_ == 0
+    if not (args := msg.get_args()):
         await help(msg)
         return
+
+    # TODO: Use match-case in Python 3.10+.
+    if (
+        args.startswith(CMD_OPTION_PREFIX)
+        and len((lang_kw := args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1))) == 2
+    ):
+        [lang, kw] = lang_kw
+    else:
+        lang = langdetect.detect(kw := args).split("-", maxsplit=1)[0]
 
     lang = iso639.Lang(lang).name
     logging.info(f"/etymology: Querying `{kw}` in {lang}")
