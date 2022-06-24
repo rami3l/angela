@@ -40,6 +40,11 @@ test = "pytest tests/"
 fmt = "black ."
 watch = "jurigged -m angela"
 
+# Enable `console_scripts` to be visible to tools like `pipx`.
+# See: https://pdm.fming.dev/latest/pyproject/pep621/#console-scripts
+[project.scripts]
+angela = "angela.__main__:main"
+
 [tool.flake8]
 # Recommend matching the black line length (default 88),
 # rather than using the flake8 default of 79:
