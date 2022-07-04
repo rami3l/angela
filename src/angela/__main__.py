@@ -225,7 +225,7 @@ async def etymology(msg: Message) -> None:
     ):
         [lang, kw] = lang_kw
     else:
-        lang = langdetect.detect(kw := args).split("-", maxsplit=1)[0]
+        lang = detected_lang = langdetect.detect(kw := args).split("-", maxsplit=1)[0]
 
     lang = iso639.Lang(lang).name
     logging.info(f"/etymology: Querying `{kw}` in {lang}")
@@ -243,15 +243,24 @@ async def etymology(msg: Message) -> None:
 
     if not (etys_str := await query(lang, kw)) and lang != "English":
         # Retry once with English.
-        etys_str = await query("English", kw)
+        etys_str = await query(lang := "English", kw)
 
-    etys_str = (
-        etys_str or f"😯 Oops, 404 NOT FOUND! (It seems like {lang} to me, though.)"
-    )
+    if etys_str:
+        kw_str = f"{kw} [{iso639.Lang(lang).pt1}]:"
+    else:
+        etys_str = f"😯 Oops, 404 NOT FOUND!\n(Looks like {iso639.Lang(detected_lang).name} to me, though.)"
+        kw_str = f"{kw}:"
 
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
     await msg.reply(
-        "\n\n".join(["🧐 Let me look it up...", f"{kw}:", etys_str, f"src: {src}"])
+        "\n\n".join(
+            [
+                "🧐 Let me look it up...",
+                kw_str,
+                etys_str,
+                f"src: {src}",
+            ]
+        )
     )
 
 
