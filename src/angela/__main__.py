@@ -61,7 +61,9 @@ def main() -> None:
     ]
     for cmd in cmds:
         handler = log_err(globals()[cmd])  # * Dynamic magic!
-        dp.message_handler(commands=cmd.replace("_", ""))(handler)
+        cmd_r = cmd.replace("_", "")
+        dp.message_handler(commands=cmd_r)(handler)
+        dp.edited_message_handler(commands=cmd_r)(handler)
 
     executor.start_polling(dp)
 

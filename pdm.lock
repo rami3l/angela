@@ -409,7 +409,7 @@ dependencies = [
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:b1fcbd1066d629178bf8ac514d5ea8201346e769b57be18e85e0c092b256a46f"
+content_hash = "sha256:ffa446b442ffbec36f7c717c185415d23eef87bfcb7e46104550f3d8e6c1665a"
 
 [metadata.files]
 "aiogram 2.21" = [
