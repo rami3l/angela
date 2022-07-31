@@ -5,7 +5,7 @@ import os
 import random
 import textwrap
 from datetime import date, datetime
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Optional
 from urllib.parse import urlparse
 
 import coloredlogs
@@ -220,6 +220,7 @@ async def etymology(msg: Message) -> None:
         await help(msg)
         return
 
+    detected_lang: Optional[str] = None
     # TODO: Use match-case in Python 3.10+.
     if (
         args.startswith(CMD_OPTION_PREFIX)
@@ -250,7 +251,11 @@ async def etymology(msg: Message) -> None:
     if etys_str:
         kw_str = f"{kw} [{iso639.Lang(lang).pt1}]:"
     else:
-        etys_str = f"😯 Oops, 404 NOT FOUND!\n(Looks like {iso639.Lang(detected_lang).name} to me, though.)"
+        etys_str = f"😯 Oops, 404 NOT FOUND!"
+        if detected_lang:
+            etys_str += (
+                f"\n(Looks like {iso639.Lang(detected_lang).name} to me, though.)"
+            )
         kw_str = f"{kw}:"
 
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
