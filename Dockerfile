@@ -14,6 +14,8 @@ COPY src/ /${APP_NAME}/src
 
 # install dependencies and project
 WORKDIR /${APP_NAME}
+# https://github.com/pdm-project/pdm/discussions/1162
+RUN pdm config python.use_venv false
 RUN pdm install --prod --no-lock --no-editable
 
 
