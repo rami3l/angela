@@ -158,15 +158,14 @@ async def random_wiki(msg: Message) -> None:
         "wiki.haskell.org",
     ]
 
-    args = msg.get_args().split()[:2]
-
-    # TODO: Use match-case in Python 3.10+.
-    if len(args) == 2:
-        [src, category] = args
-        category = category.lstrip(CMD_OPTION_PREFIX)
-    else:
-        src = args[0] if args else random.choice(srcs)
-        category = None
+    category = None
+    match msg.get_args().split():
+        case [src, category, *_]:
+            category = category.lstrip(CMD_OPTION_PREFIX)
+        case [src]:
+            ...
+        case _:
+            src = random.choice(srcs)
 
     prefixes = ["wiki/", "title/", ""]
     suffix = (
@@ -221,14 +220,12 @@ async def etymology(msg: Message) -> None:
         return
 
     detected_lang: Optional[str] = None
-    # TODO: Use match-case in Python 3.10+.
-    if (
-        args.startswith(CMD_OPTION_PREFIX)
-        and len((lang_kw := args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1))) == 2
-    ):
-        [lang, kw] = lang_kw
-    else:
-        lang = detected_lang = langdetect.detect(kw := args).split("-", maxsplit=1)[0]
+    match args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1):
+        case [lang, kw] if args.startswith(CMD_OPTION_PREFIX):
+            ...
+        case _:
+            kw = args
+            lang = detected_lang = langdetect.detect(kw).split("-", maxsplit=1)[0]
 
     lang = iso639.Lang(lang).name
     logging.info(f"/etymology: Querying `{kw}` in {lang}")
