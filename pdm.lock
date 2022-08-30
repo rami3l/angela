@@ -1,6 +1,6 @@
 [[package]]
 name = "aiogram"
-version = "2.21"
+version = "2.22.1"
 requires_python = ">=3.7"
 summary = "Is a pretty simple and fully asynchronous framework for Telegram Bot API"
 dependencies = [
@@ -85,7 +85,6 @@ dependencies = [
     "pathspec>=0.9.0",
     "platformdirs>=2",
     "tomli>=1.1.0; python_full_version < \"3.11.0a7\"",
-    "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -230,12 +229,9 @@ summary = "Experimental type system extensions for programs checked with the myp
 
 [[package]]
 name = "overrides"
-version = "6.1.0"
+version = "6.2.0"
 requires_python = ">=3.6"
 summary = "A decorator to automatically detect mismatch when overriding a method."
-dependencies = [
-    "typing-utils>=0.0.3",
-]
 
 [[package]]
 name = "ovld"
@@ -366,12 +362,6 @@ requires_python = ">=3.7"
 summary = "Backported and Experimental Type Hints for Python 3.7+"
 
 [[package]]
-name = "typing-utils"
-version = "0.1.0"
-requires_python = ">=3.6.1"
-summary = "utils to inspect Python type annotations"
-
-[[package]]
 name = "urllib3"
 version = "1.26.11"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4"
@@ -409,12 +399,12 @@ dependencies = [
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:ffa446b442ffbec36f7c717c185415d23eef87bfcb7e46104550f3d8e6c1665a"
+content_hash = "sha256:14714c76a288bcb7cf557350cc173e997d7809bcf85ed4324680b6b16f5ea2f9"
 
 [metadata.files]
-"aiogram 2.21" = [
-    {url = "https://files.pythonhosted.org/packages/c6/c7/26b0b5fd79ab734fd5b2e419148c9ec26513c96108f5afadb7a834393395/aiogram-2.21-py3-none-any.whl", hash = "sha256:33ee61db550f6fc455e2d74d8911af31108e3c398eda03c2f91b0a7cb32a97d9"},
-    {url = "https://files.pythonhosted.org/packages/ef/f9/4a34a841e09943075eea05b54bd58f7f5a6f3fc701c996177493f8ebfced/aiogram-2.21.tar.gz", hash = "sha256:390ac56a629cd0d151d544e3b87d539ee49f734ccc7a1a7e375c33f436e556e0"},
+"aiogram 2.22.1" = [
+    {url = "https://files.pythonhosted.org/packages/04/79/cf63e53770baee827039488964e5482857e5dc4c589c6480a883aedeccc5/aiogram-2.22.1.tar.gz", hash = "sha256:38bc3fa59b797e444c576d927650abff845620a579b9579ec85cd0a4e19b90a8"},
+    {url = "https://files.pythonhosted.org/packages/81/db/6a8432f5c4f5161f153df2382eabb3c7b0d6f953c9ac2452014a1f2c8515/aiogram-2.22.1-py3-none-any.whl", hash = "sha256:46b38f7e3c3057ed1eb6c46225f50f0a74e3285937a61cb02d708ec200672f34"},
 ]
 "aiohttp 3.8.1" = [
     {url = "https://files.pythonhosted.org/packages/07/2b/ef0ea5695809b1d5e485e136fcf9c1e00c3d8e7806f4bba9af3e77cb7a7d/aiohttp-3.8.1-cp37-cp37m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:477c3ea0ba410b2b56b7efb072c36fa91b1e6fc331761798fa3f28bb224830dd"},
@@ -753,9 +743,9 @@ content_hash = "sha256:ffa446b442ffbec36f7c717c185415d23eef87bfcb7e46104550f3d8e
     {url = "https://files.pythonhosted.org/packages/5c/eb/975c7c080f3223a5cdaff09612f3a5221e4ba534f7039db34c35d95fa6a5/mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {url = "https://files.pythonhosted.org/packages/63/60/0582ce2eaced55f65a4406fc97beba256de4b7a95a0034c6576458c6519f/mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
-"overrides 6.1.0" = [
-    {url = "https://files.pythonhosted.org/packages/52/86/7f70ed8b5957b094a432cc839ea99cffac62a41861d4d2075d742a45953b/overrides-6.1.0.tar.gz", hash = "sha256:5ba636b73bf72d3d80550f4a5dfe3c7d04ec6e8fd246c4074bfc7ad82bd0ea3d"},
-    {url = "https://files.pythonhosted.org/packages/db/52/1ee39040faa35ee9a609a4c7c95b017713f0b8d63399d5ecbaa6555a3cea/overrides-6.1.0-py3-none-any.whl", hash = "sha256:33926e018a952b06309517b3febede982112b86430e588bdd00560b80a4a800b"},
+"overrides 6.2.0" = [
+    {url = "https://files.pythonhosted.org/packages/5b/65/0e28558b319dd0c6990644224fcb76c317c88e7bd266d3c3ed40e525e977/overrides-6.2.0-py3-none-any.whl", hash = "sha256:2f62e9dba0cd96d2cddee8c8a2bae59d6179e9e0993235466727681a6bfee789"},
+    {url = "https://files.pythonhosted.org/packages/91/61/79f6f13e322f0093a7fc1ae99fef15236f43589373beee5982bfd0b69fa9/overrides-6.2.0.tar.gz", hash = "sha256:e15c1a7d9a605999507a5e17d36505319f9e971cbcbde37b507c84346318301b"},
 ]
 "ovld 0.3.2" = [
     {url = "https://files.pythonhosted.org/packages/e0/96/6e1e1ce208ba399a92865a1e0a5999f08386eea047895dd3d70329b41617/ovld-0.3.2-py3-none-any.whl", hash = "sha256:3a5f08f66573198b490fc69dcf93a2ad9b4d90fd1fef885cf7a8dbe565f17837"},
@@ -827,10 +817,6 @@ content_hash = "sha256:ffa446b442ffbec36f7c717c185415d23eef87bfcb7e46104550f3d8e
 "typing-extensions 4.3.0" = [
     {url = "https://files.pythonhosted.org/packages/9e/1d/d128169ff58c501059330f1ad96ed62b79114a2eb30b8238af63a2e27f70/typing_extensions-4.3.0.tar.gz", hash = "sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6"},
     {url = "https://files.pythonhosted.org/packages/ed/d6/2afc375a8d55b8be879d6b4986d4f69f01115e795e36827fd3a40166028b/typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
-]
-"typing-utils 0.1.0" = [
-    {url = "https://files.pythonhosted.org/packages/66/6e/99fe160a19676051070aa1da4ca44aac2a213e79ba1a492b5f03facf6447/typing_utils-0.1.0-py3-none-any.whl", hash = "sha256:6bd26f3d38a5dd526ca3a59f0a451ccb59bcee9dc829c872dd6c0aae4ec8bbef"},
-    {url = "https://files.pythonhosted.org/packages/c0/9f/ddc5ed9182f49d6ca5d87a7629dea81ca076db54f30f78d057a081f5ec50/typing_utils-0.1.0.tar.gz", hash = "sha256:8ff6b6705414b82575ad5ae0925ac414a9650fb8c5718289b1327dec61252f65"},
 ]
 "urllib3 1.26.11" = [
     {url = "https://files.pythonhosted.org/packages/6d/d5/e8258b334c9eb8eb78e31be92ea0d5da83ddd9385dc967dd92737604d239/urllib3-1.26.11.tar.gz", hash = "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a"},
