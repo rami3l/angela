@@ -81,9 +81,13 @@ def log_err(
     return f1
 
 
-async def help(msg: Message) -> None:
+async def help(msg: Message, usages: Optional[list[str]] = None) -> None:
     title = (src := msg.from_user) and src.first_name or "Hi"
-    await msg.reply(f"🤔 {title}, what's on your mind?")
+    reply = "\n".join(
+        [f"🤔 Dear {title}, what's on your mind?"]
+        + (["\n💡 Maybe you could try one of the following:"] + usages if usages else [])
+    )
+    await msg.reply(reply)
 
 
 async def hello(msg: Message) -> None:
@@ -93,7 +97,7 @@ async def hello(msg: Message) -> None:
 
 async def ddg(msg: Message) -> None:
     if not (kw := msg.get_args()):
-        await help(msg)
+        await help(msg, usages=["/ddg GitHub", "/ddg !wiktionary rust"])
         return
     res = await asyncio.to_thread(lambda: duckduckgo.get_zci(kw))
     await msg.reply(
@@ -109,7 +113,7 @@ async def ddg(msg: Message) -> None:
 
 async def decide(msg: Message) -> None:
     if not (options := msg.get_args().split()):
-        await help(msg)
+        await help(msg, usages=["/decide head tail"])
         return
     formats = ["🤔 Emmm... I'd say {}.", "💡 What about {}?"]
     await msg.reply(random.choice(formats).format(random.choice(options)))
@@ -216,7 +220,14 @@ async def random_wiki(msg: Message) -> None:
 @log_err
 async def etymology(msg: Message) -> None:
     if not (args := msg.get_args()):
-        await help(msg)
+        await help(
+            msg,
+            usages=[
+                "/etymology 春眠暁を覚えず",
+                "/etymology %de Kaiser",
+                "/etymology %Latin nodus",
+            ],
+        )
         return
 
     detected_lang: Optional[str] = None
