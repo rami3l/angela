@@ -5,7 +5,7 @@ import os
 import random
 import textwrap
 from datetime import date, datetime
-from typing import Awaitable, Callable, Optional
+from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
 import coloredlogs
@@ -44,7 +44,7 @@ def main() -> None:
         4: logging.DEBUG,
     }.get(opts.verbosity, logging.INFO)
     logging.basicConfig(level=verbosity)
-    coloredlogs.install()
+    coloredlogs.install()  # type: ignore
 
     logging.warning("Angela is waking up...")
 
@@ -81,7 +81,7 @@ def log_err(
     return f1
 
 
-async def help(msg: Message, usages: Optional[list[str]] = None) -> None:
+async def help(msg: Message, usages: list[str] | None = None) -> None:
     title = (src := msg.from_user) and src.first_name or "Hi"
     reply = "\n".join(
         [f"🤔 Dear {title}, what's on your mind?"]
@@ -112,7 +112,7 @@ async def ddg(msg: Message) -> None:
 
 
 async def decide(msg: Message) -> None:
-    if not (options := msg.get_args().split()):
+    if not ((args := msg.get_args()) and (options := args.split())):
         await help(msg, usages=["/decide head tail"])
         return
     formats = ["🤔 Emmm... I'd say {}.", "💡 What about {}?"]
@@ -158,12 +158,13 @@ async def random_wiki(msg: Message) -> None:
         "commons.wikimedia.org",
         "species.wikimedia.org",
         "evangelion.fandom.com",
+        "www.explainxkcd.com",
         "wiki.archlinux.org",
         "wiki.haskell.org",
     ]
 
-    category = None
-    match msg.get_args().split():
+    category: str | None = None
+    match (args := msg.get_args()) and args.split():
         case [src, category, *_]:
             category = category.lstrip(CMD_OPTION_PREFIX)
         case [src]:
@@ -171,14 +172,14 @@ async def random_wiki(msg: Message) -> None:
         case _:
             src = random.choice(srcs)
 
-    prefixes = ["wiki/", "title/", ""]
+    prefixes = ["wiki/", "wiki/index.php/", "title/", ""]
     suffix = (
         f"Special:RandomInCategory/{urlencode(category)}"
         if category
         else "Special:Random"
     )
 
-    async def handle_prefix(prefix):
+    async def handle_prefix(prefix: str):
         endpoint = f"https://{src}/{prefix}{suffix}"
         return await capture_redir(endpoint)
 
@@ -230,7 +231,7 @@ async def etymology(msg: Message) -> None:
         )
         return
 
-    detected_lang: Optional[str] = None
+    detected_lang: str | None = None
     match args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1):
         case [lang, kw] if args.startswith(CMD_OPTION_PREFIX):
             ...

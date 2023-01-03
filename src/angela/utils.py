@@ -4,7 +4,6 @@ import ssl
 import urllib.parse
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Optional
 
 import aiohttp
 import certifi
@@ -21,7 +20,7 @@ urlencode = functools.partial(urllib.parse.quote, safe="")
 urldecode = urllib.parse.unquote
 
 
-async def capture_redir(url: str) -> Optional[str]:
+async def capture_redir(url: str) -> str | None:
     async with aiohttp.ClientSession() as session, session.get(
         url, ssl=SSL_CTX
     ) as resp:

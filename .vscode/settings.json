@@ -9,5 +9,6 @@
     "__pypackages__/3.9/lib",
     "__pypackages__/3.10/lib",
     "__pypackages__/3.11/lib"
-  ]
+  ],
+  "cSpell.words": ["duckduckgo"]
 }
