@@ -1,9 +1,9 @@
-import functools
 import json
 import ssl
 import urllib.parse
 from dataclasses import dataclass
 from datetime import date, timedelta
+from typing import Iterable
 
 import aiohttp
 import certifi
@@ -16,7 +16,14 @@ def unescape(s: str) -> str:
     return json.loads(f'"{s}"')
 
 
-urlencode = functools.partial(urllib.parse.quote, safe="")
+def urlencode(
+    s: str, safe: str | Iterable[int] = "", space_to_plus: bool = False
+) -> str:
+    return (urllib.parse.quote_plus if space_to_plus else urllib.parse.quote)(
+        s, safe=safe
+    )
+
+
 urldecode = urllib.parse.unquote
 
 

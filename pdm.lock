@@ -110,6 +110,15 @@ requires_python = ">=3.7.0"
 summary = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 
 [[package]]
+name = "cheat-sh"
+version = "0.0.2"
+requires_python = ">=3.7"
+summary = "wrapper around http://cheat.sh"
+dependencies = [
+    "requests",
+]
+
+[[package]]
 name = "click"
 version = "8.1.3"
 requires_python = ">=3.7"
@@ -396,7 +405,7 @@ dependencies = [
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:663806e2f2939528eb6d296c3c57bbb72ac4d43e564f3a023acdaf583c80f5fd"
+content_hash = "sha256:e2b3a3171052b9d35d4f598997cec39c4417fc1486c31c1b52485808574404fb"
 
 [metadata.files]
 "aiogram 2.25.1" = [
@@ -627,6 +636,10 @@ content_hash = "sha256:663806e2f2939528eb6d296c3c57bbb72ac4d43e564f3a023acdaf583
     {url = "https://files.pythonhosted.org/packages/f8/ed/500609cb2457b002242b090c814549997424d72690ef3058cfdfca91f68b/charset_normalizer-3.1.0-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:78cacd03e79d009d95635e7d6ff12c21eb89b894c354bd2b2ed0b4763373693b"},
     {url = "https://files.pythonhosted.org/packages/fa/8e/2e5c742c3082bce3eea2ddd5b331d08050cda458bc362d71c48e07a44719/charset_normalizer-3.1.0-cp37-cp37m-musllinux_1_1_ppc64le.whl", hash = "sha256:04afa6387e2b282cf78ff3dbce20f0cc071c12dc8f685bd40960cc68644cfea6"},
     {url = "https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz", hash = "sha256:34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5"},
+]
+"cheat-sh 0.0.2" = [
+    {url = "https://files.pythonhosted.org/packages/2a/51/7a088621d7e4dac1f471b36fc653fa1e5e37ad7f236ba134fdd3a98ee7d0/cheat_sh-0.0.2.tar.gz", hash = "sha256:a762dbb34d8d365dd1d8209819a3d9de28685bd08516caa59d4adf163a43b0e9"},
+    {url = "https://files.pythonhosted.org/packages/a6/43/606452a4643c4788d08f74118c940041c70b37cbb2fea098031806cf2bac/cheat_sh-0.0.2-py3-none-any.whl", hash = "sha256:774a7a94a1dcc12b2f56bdf81ea23b47a08be30468341372a2656c9e90774e74"},
 ]
 "click 8.1.3" = [
     {url = "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz", hash = "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"},

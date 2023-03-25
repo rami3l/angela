@@ -8,6 +8,7 @@ from datetime import date, datetime
 from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
+import cheat_sh
 import coloredlogs
 import duckduckgo
 import iso639
@@ -51,6 +52,7 @@ def main() -> None:
     dp = Dispatcher(Bot(token=opts.token))
 
     cmds = [
+        "cheat",
         "ddg",
         "decide",
         "etymology",
@@ -260,7 +262,7 @@ async def etymology(msg: Message) -> None:
     if etys_str:
         kw_str = f"{kw} [{iso639.Lang(lang).pt1}]:"
     else:
-        etys_str = f"😯 Oops, 404 NOT FOUND!"
+        etys_str = "😯 Oops, 404 NOT FOUND!"
         if detected_lang:
             etys_str += (
                 f"\n(Looks like {iso639.Lang(detected_lang).name} to me, though.)"
@@ -271,6 +273,23 @@ async def etymology(msg: Message) -> None:
     await msg.reply(
         "\n\n".join(["🧐 Let me look it up...", kw_str, etys_str, f"src: {src}"])
     )
+
+
+@log_err
+async def cheat(msg: Message) -> None:
+    if not (kws := msg.get_args()):
+        await help(
+            msg,
+            usages=[
+                "/cheat clojure reverse list",
+                "/cheat golang read string line by line",
+            ],
+        )
+        return
+
+    ans = await asyncio.to_thread(lambda: cheat_sh.requests_cheat_sh(kws))
+    src = ("http://cheat.sh/" + urlencode(kws, safe="/+")).rstrip("/")
+    await msg.reply("\n\n".join(["💡 Seems like I can help!", ans, f"src: {src}"]))
 
 
 if __name__ == "__main__":
