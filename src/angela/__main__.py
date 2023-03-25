@@ -269,14 +269,7 @@ async def etymology(msg: Message) -> None:
 
     src = f"https://en.wiktionary.org/wiki/{urlencode(kw)}"
     await msg.reply(
-        "\n\n".join(
-            [
-                "🧐 Let me look it up...",
-                kw_str,
-                etys_str,
-                f"src: {src}",
-            ]
-        )
+        "\n\n".join(["🧐 Let me look it up...", kw_str, etys_str, f"src: {src}"])
     )
 
 
