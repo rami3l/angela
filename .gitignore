@@ -156,7 +156,7 @@ cython_debug/
 # ===== EXTRA =====
 
 # PDM
-.pdm.toml
+.pdm-python
 
 # Telegram bot dotenv
 .env
