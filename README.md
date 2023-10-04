@@ -1,5 +1,7 @@
 # Angela
 
+My own toy Telegram bot project, built just for fun!
+
 ## Quick Start
 
 An environment variable `ANGELA_TELEGRAM_BOT_TOKEN` should be created. Alternatively, you can create a `.env` file like this (replace with your own token):
