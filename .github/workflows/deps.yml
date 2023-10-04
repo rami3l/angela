@@ -1,0 +1,25 @@
+name: deps
+
+on:
+  schedule:
+    - cron: "0 0 1 * *" # monthly
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update dependencies
+        uses: pdm-project/update-deps-action@main
+        with:
+          # The personal access token, default: ${{ github.token }}
+          # token: ${{ secrets.GH_TOKEN }}
+
+          commit-message: "chore: update `pdm.lock`"
+          pr-title: "chore: update `pdm.lock`"
+
+          # The update strategy, can be 'reuse', 'eager' or 'all'
+          update-strategy: all
+          # Whether to install PDM plugins before update
+          install-plugins: "true"
