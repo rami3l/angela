@@ -209,7 +209,7 @@ async def random_wiki(msg: Message, command: CommandObject) -> None:
 
 @dp.message(Command("etymology"))
 async def etymology(msg: Message, command: CommandObject) -> None:
-    if not (args := command.args):
+    async def _help():
         await help(
             msg,
             usages=[
@@ -219,17 +219,24 @@ async def etymology(msg: Message, command: CommandObject) -> None:
                 "/etymology %Latin nodus",
             ],
         )
+
+    if not (args := command.args):
+        await _help()
         return
 
     lang: str | None = None
-    match args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1):
-        case [lang, kw] if args.startswith(CMD_OPTION_PREFIX):
-            if lang == "auto":
-                lang = langdetect.detect(kw).split("-", maxsplit=1)[0]
-        case [kw]:
-            ...
-        case _:
-            raise NotImplementedError("unreachable code")
+    if args.startswith(CMD_OPTION_PREFIX):
+        match args.lstrip(CMD_OPTION_PREFIX).split(maxsplit=1):
+            case [lang, kw]:
+                # ["de", "Kaiser"] / ["auto", "Kaiser"]
+                if lang == "auto":
+                    lang = langdetect.detect(kw).split("-", maxsplit=1)[0]
+            case _:
+                # ["de"] / ["unknown"]
+                await _help()
+                return
+    else:
+        kw = args
 
     lang = iso639.Lang(lang).name if lang else None
     logging.info(f"/etymology: Querying `{kw}` in {lang or '(default language)'}")
