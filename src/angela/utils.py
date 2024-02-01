@@ -28,9 +28,10 @@ urldecode = urllib.parse.unquote
 
 
 async def capture_redir(url: str) -> str | None:
-    async with aiohttp.ClientSession() as session, session.get(
-        url, ssl=SSL_CTX
-    ) as resp:
+    async with (
+        aiohttp.ClientSession() as session,
+        session.get(url, ssl=SSL_CTX) as resp,
+    ):
         return redir if (redir := str(resp.url)).lower() != url.lower() else None
 
 

@@ -69,7 +69,11 @@ async def help(msg: Message, usages: list[str] | None = None) -> None:
     title = (src := msg.from_user) and src.first_name or "Hi"
     reply = "\n".join(
         [f"🤔 Dear {title}, what's on your mind?"]
-        + (["\n💡 Maybe you could try one of the following:"] + usages if usages else [])
+        + (
+            ["\n💡 Maybe you could try one of the following:"] + usages
+            if usages
+            else []
+        )
     )
     await msg.reply(reply)
 
