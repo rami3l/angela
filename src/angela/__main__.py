@@ -4,7 +4,7 @@ import logging
 import os
 import random
 import textwrap
-from datetime import date, datetime
+from datetime import UTC, datetime
 from urllib.parse import urlparse
 
 import cheat_sh
@@ -112,7 +112,7 @@ async def decide(msg: Message, command: CommandObject) -> None:
 
 @dp.message(Command("rustrelease"))
 async def rust_release(msg: Message) -> None:
-    now: date = datetime.utcnow().date()
+    now = datetime.now(UTC).date()
     [stable, beta, nightly, next_] = [
         RustV1Release(now + i * RustV1Release.RELEASE_PERIOD) for i in range(4)
     ]
