@@ -1,0 +1,6 @@
+angela:
+  telegram:
+    bot:
+      token: ${ANGELA_TELEGRAM_BOT_TOKEN}
+      username: ${ANGELA_TELEGRAM_BOT_USERNAME}
+
