@@ -8,7 +8,7 @@ import (
 )
 
 func Hello(ctx tgb.Context) error {
-	return ctx.Send(fmt.Sprintf(
+	return ctx.Reply(fmt.Sprintf(
 		"%s, I'm right beside you!",
 		cmp.Or(ctx.Sender().FirstName, "Hi"),
 	))

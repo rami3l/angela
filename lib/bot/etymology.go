@@ -36,7 +36,7 @@ func Etymology(ctx tgb.Context) error {
 	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
 		log.WithField("result", respStr).Info("/etymology: Wiktionary extract not found")
-		ctx.Send("Oops, looks like there isn't such a word in Wiktionary...")
+		ctx.Reply("Oops, looks like there isn't such a word in Wiktionary...")
 		return nil
 	}
 
@@ -77,5 +77,5 @@ func Etymology(ctx tgb.Context) error {
 		log.WithField("fstEntry", fstEntry).Info("/etymology: Got first entry")
 		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%s\n\nsrc: %s", arg, fstEntry, src)
 	}
-	return ctx.Send(reply)
+	return ctx.Reply(reply)
 }

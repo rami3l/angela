@@ -41,7 +41,7 @@ func RustRelease(ctx tgb.Context) error {
 	nightly := rustV1Release{now.AddDate(0, 0, 7*6*2)}
 	next := rustV1Release{now.AddDate(0, 0, 7*6*3)}
 
-	return ctx.Send(fmt.Sprintf(
+	return ctx.Reply(fmt.Sprintf(
 		"Oh, I just asked Ferris 🦀️...\n\nstable:%s\nbeta:%s\nnightly:%s\nnext:%s\n",
 		sprintRelease(stable), sprintRelease(beta), sprintRelease(nightly), sprintRelease(next),
 	), &tgb.SendOptions{ParseMode: tgb.ModeMarkdown})
