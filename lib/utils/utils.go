@@ -12,10 +12,10 @@ func UnescapeUtf8(jsonStr string) (outStr string, err error) {
 }
 
 func CaptureRedirect(url string) (redirected string, err error) {
-	res, err := http.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		return
 	}
-	redirected = res.Request.URL.String()
+	redirected = resp.Request.URL.String()
 	return
 }

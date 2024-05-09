@@ -46,7 +46,7 @@ func Etymology(ctx tgb.Context) error {
 	}
 
 	var reply string
-	src := fmt.Sprintf("https://en.wiktionary.org/wiki/%s", url.QueryEscape(arg))
+	src := "https://en.wiktionary.org/wiki/" + url.QueryEscape(arg)
 	if strings.TrimSpace(body) == "" {
 		log.Info("/etymology: No etymology entries found")
 		reply = fmt.Sprintf("Let me look it up...\n\nOops, it seems that I can't find the etymology in %s...", src)

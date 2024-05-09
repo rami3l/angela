@@ -30,6 +30,7 @@ func LaunchBot(token string) (err error) {
 		}
 	}
 
+	b.Handle("/cheat", withLog(bot.Cheat))
 	b.Handle("/ddg", withLog(bot.DuckDuckGo))
 	b.Handle("/decide", withLog(bot.Decide))
 	b.Handle("/etymology", withLog(bot.Etymology))
