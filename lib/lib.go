@@ -3,6 +3,7 @@ package lib
 import (
 	"time"
 
+	"github.com/rami3l/angela/lib/bot"
 	log "github.com/sirupsen/logrus"
 	tgb "gopkg.in/telebot.v3"
 )
@@ -10,7 +11,7 @@ import (
 type ContextHandler = func(ctx tgb.Context) error
 
 func LaunchBot(token string) (err error) {
-	bot, err := tgb.NewBot(tgb.Settings{
+	b, err := tgb.NewBot(tgb.Settings{
 		Token:  token,
 		Poller: &tgb.LongPoller{Timeout: 10 * time.Second},
 	})
@@ -29,12 +30,12 @@ func LaunchBot(token string) (err error) {
 		}
 	}
 
-	bot.Handle("/hello", withLog(onHello))
-	bot.Handle("/decide", withLog(onDecide))
-	bot.Handle("/rustrelease", withLog(onRustRelease))
-	bot.Handle("/randomwiki", withLog(onRandomWiki))
-	bot.Handle("/etymology", withLog(onEtymology))
+	b.Handle("/hello", withLog(bot.Hello))
+	b.Handle("/decide", withLog(bot.Decide))
+	b.Handle("/rustrelease", withLog(bot.RustRelease))
+	b.Handle("/randomwiki", withLog(bot.RandomWiki))
+	b.Handle("/etymology", withLog(bot.Etymology))
 
-	bot.Start()
+	b.Start()
 	return
 }
