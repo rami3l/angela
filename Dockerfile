@@ -1,5 +1,5 @@
 # Build Stage
-FROM golang:1.17-alpine as angela-builder
+FROM golang:1-alpine as angela-builder
 
 # Set environment variable
 ENV APP_NAME angela
@@ -13,7 +13,7 @@ WORKDIR $GOPATH/src/$APP_NAME
 RUN CGO_ENABLED=0 go build -v -o /$APP_NAME $GOPATH/src/$APP_NAME/$CMD_PATH
 
 # Run Stage
-FROM alpine:3.15 AS angela
+FROM alpine:3 AS angela
 
 # Set environment variable
 ENV APP_NAME angela

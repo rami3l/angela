@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   angela:
     container_name: angela
