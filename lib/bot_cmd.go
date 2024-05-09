@@ -2,8 +2,9 @@ package lib
 
 import (
 	"bufio"
+	"cmp"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"net/url"
 	"regexp"
 	"strings"
@@ -11,21 +12,23 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
-	tgb "gopkg.in/tucnak/telebot.v2"
+	tgb "gopkg.in/telebot.v3"
 )
 
-func onHello(bot *tgb.Bot, msg *tgb.Message) {
-	bot.Send(msg.Chat, fmt.Sprintf("%s, I'm right beside you!", msg.Sender.FirstName))
+func onHello(ctx tgb.Context) error {
+	return ctx.Send(fmt.Sprintf(
+		"%s, I'm right beside you!",
+		cmp.Or(ctx.Sender().FirstName, "Hi"),
+	))
 }
 
-func onDecide(bot *tgb.Bot, msg *tgb.Message) {
-	args := StripCmdHead(msg.Text)
-	// TODO: Refactor this with generic RandItem[T] when Golang v1.18 comes out.
-	item := args[rand.Intn(len(args))]
-	bot.Send(msg.Chat, fmt.Sprintf("Emmm... I'd say %s.", item))
+func onDecide(ctx tgb.Context) error {
+	args := ctx.Args()
+	item := args[rand.IntN(len(args))]
+	return ctx.Send(fmt.Sprintf("Emmm... I'd say %s.", item))
 }
 
-func onRustRelease(bot *tgb.Bot, msg *tgb.Message) {
+func onRustRelease(ctx tgb.Context) error {
 	type rustV1Release struct{ date time.Time }
 
 	epoch := time.Date(2015, time.December, 10, 0, 0, 0, 0, time.UTC)
@@ -59,23 +62,23 @@ func onRustRelease(bot *tgb.Bot, msg *tgb.Message) {
 	nightly := rustV1Release{now.AddDate(0, 0, 7*6*2)}
 	next := rustV1Release{now.AddDate(0, 0, 7*6*3)}
 
-	bot.Send(msg.Chat, fmt.Sprintf("Oh, I just asked Ferris 🦀️:\n\n```\nstable:%s\nbeta:%s\nnightly:%s\nnext:%s\n```",
+	return ctx.Send(fmt.Sprintf(
+		"Oh, I just asked Ferris 🦀️...\n\nstable:%s\nbeta:%s\nnightly:%s\nnext:%s\n",
 		sprintRelease(stable), sprintRelease(beta), sprintRelease(nightly), sprintRelease(next),
 	), &tgb.SendOptions{ParseMode: tgb.ModeMarkdown})
 }
 
-func onRandomWiki(bot *tgb.Bot, msg *tgb.Message) {
+func onRandomWiki(ctx tgb.Context) error {
 	url, err := CaptureRedirect("https://en.wikipedia.org/wiki/Special:Random")
 	if err != nil {
-		log.Warning(err)
-		return
+		return err
 	}
 	log.WithField("pageUrl", url).Info("/randomwiki: Got random page")
-	bot.Send(msg.Chat, fmt.Sprintf("(Paper fluttering...)\n\nHere you go!\n%s", url))
+	return ctx.Send(fmt.Sprintf("(Paper fluttering...)\n\nHere you go!\n%s", url))
 }
 
-func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
-	args := StripCmdHead(msg.Text)
+func onEtymology(ctx tgb.Context) error {
+	args := ctx.Args()
 	arg := strings.Join(args, " ")
 
 	endpoint := "https://en.wiktionary.org/w/api.php"
@@ -87,21 +90,18 @@ func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 		"explaintext": "",
 	}
 
-	client := resty.New()
-	res, err := client.R().
-		SetQueryParams(query).
-		Get(endpoint)
+	resp, err := resty.New().R().SetQueryParams(query).Get(endpoint)
 	if err != nil {
-		log.Warning(err)
-		return
+		return err
 	}
 
-	resStr := res.String()
+	respStr := resp.String()
 	pat := regexp.MustCompile(`\"extract\":\"(.*)\"`)
-	matches := pat.FindStringSubmatch(resStr)
+	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
-		log.WithField("result", resStr).Info("/etymology: Wiktionary extract not found")
-		bot.Send(msg.Chat, "Emmm... Is there really such a word?")
+		log.WithField("result", respStr).Info("/etymology: Wiktionary extract not found")
+		ctx.Send("Oops, looks like there isn't such a word in Wiktionary...")
+		return nil
 	}
 
 	rawExtract := matches[1]
@@ -141,5 +141,5 @@ func onEtymology(bot *tgb.Bot, msg *tgb.Message) {
 		log.WithField("fstEntry", fstEntry).Info("/etymology: Got first entry")
 		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%s\n\nsrc: %s", arg, fstEntry, src)
 	}
-	bot.Send(msg.Chat, reply)
+	return ctx.Send(reply)
 }
