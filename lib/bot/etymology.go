@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"bufio"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -41,6 +40,24 @@ func Etymology(ctx tgb.Context) error {
 	}
 
 	rawExtract := matches[1]
+	body := ""
+	for i, entry := range extractEtymology(rawExtract) {
+		body += fmt.Sprintf("%d. %s", i+1, entry) + "\n\n"
+	}
+
+	var reply string
+	src := fmt.Sprintf("https://en.wiktionary.org/wiki/%s", url.QueryEscape(arg))
+	if strings.TrimSpace(body) == "" {
+		log.Info("/etymology: No etymology entries found")
+		reply = fmt.Sprintf("Let me look it up...\n\nOops, it seems that I can't find the etymology in %s...", src)
+	} else {
+		log.WithField("body", body).Debug("/etymology: Got body")
+		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%ssrc: %s", arg, body, src)
+	}
+	return ctx.Reply(reply)
+}
+
+func extractEtymology(rawExtract string) (entries []string) {
 	log.WithField("rawExtract", rawExtract).Debug("/etymology: Got raw extract")
 	extract, err := utils.UnescapeUtf8(rawExtract)
 	if err != nil {
@@ -48,34 +65,21 @@ func Etymology(ctx tgb.Context) error {
 	}
 	log.WithField("extract", extract).Debug("/etymology: Got extract")
 
-	fstEntryLns := []string{}
-
-	// Read `extract` line by line and extract the first etymology entry.
-	scanner := bufio.NewScanner(strings.NewReader(extract))
-	// Skip while the current line doesn't contain the substring.
-	for scanner.Scan() && !strings.Contains(scanner.Text(), "= Etymology") {
-	}
-	// Take while the current line doesn't start with the prefix.
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "=") {
-			break
+	lns := strings.Split(extract, "\n")
+	entryLns := []string{}
+	for i := 0; i < len(lns); i++ {
+		for ; i < len(lns) && !strings.Contains(lns[i], "= Etymology"); i++ {
 		}
-		if strings.TrimSpace(line) != "" {
-			fstEntryLns = append(fstEntryLns, line)
+		i++
+		for ; i < len(lns) && !strings.HasPrefix(lns[i], "="); i++ {
+			if strings.TrimSpace(lns[i]) != "" {
+				entryLns = append(entryLns, lns[i])
+			}
+		}
+		if len(entryLns) != 0 {
+			entries = append(entries, strings.Join(entryLns, "\n"))
+			entryLns = entryLns[:0]
 		}
 	}
-
-	fstEntry := strings.Join(fstEntryLns, "\n")
-	src := fmt.Sprintf("https://en.wiktionary.org/wiki/%s", url.QueryEscape(arg))
-
-	var reply string
-	if strings.TrimSpace(fstEntry) == "" {
-		log.Info("/etymology: No etymology entries found")
-		reply = fmt.Sprintf("Let me look it up...\n\nOops, it seems that I can't find the etymology in %s...", src)
-	} else {
-		log.WithField("fstEntry", fstEntry).Info("/etymology: Got first entry")
-		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%s\n\nsrc: %s", arg, fstEntry, src)
-	}
-	return ctx.Reply(reply)
+	return
 }
