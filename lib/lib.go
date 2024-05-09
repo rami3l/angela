@@ -30,11 +30,12 @@ func LaunchBot(token string) (err error) {
 		}
 	}
 
-	b.Handle("/hello", withLog(bot.Hello))
+	b.Handle("/ddg", withLog(bot.DuckDuckGo))
 	b.Handle("/decide", withLog(bot.Decide))
-	b.Handle("/rustrelease", withLog(bot.RustRelease))
-	b.Handle("/randomwiki", withLog(bot.RandomWiki))
 	b.Handle("/etymology", withLog(bot.Etymology))
+	b.Handle("/hello", withLog(bot.Hello))
+	b.Handle("/randomwiki", withLog(bot.RandomWiki))
+	b.Handle("/rustrelease", withLog(bot.RustRelease))
 
 	b.Start()
 	return
