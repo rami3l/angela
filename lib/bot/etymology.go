@@ -31,7 +31,7 @@ func Etymology(ctx tgb.Context) error {
 	}
 
 	respStr := resp.String()
-	pat := regexp.MustCompile(`\"extract\":\"(.*?)\"`)
+	pat := regexp.MustCompile(`\"extract\":\"(.*?[^\\])\"`)
 	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
 		log.WithField("result", respStr).Info("/etymology: Wiktionary extract not found")
