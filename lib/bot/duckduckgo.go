@@ -42,7 +42,9 @@ func DuckDuckGo(ctx tgb.Context) error {
 	}
 
 	respObj := duckDuckGoResp{}
-	json.Unmarshal(resp.Body(), &respObj)
+	if err := json.Unmarshal(resp.Body(), &respObj); err != nil {
+		return err
+	}
 	log.WithField("resp", fmt.Sprintf("%+v", respObj)).Debug("/ddg: Got recommendation")
 
 	fstResult := ""
@@ -53,8 +55,7 @@ func DuckDuckGo(ctx tgb.Context) error {
 		respObj.Answer, respObj.Abstract, fstResult, respObj.Definition, respObj.Redirect,
 	)
 	if body == "" {
-		ctx.Reply("Oops, 404 NOT FOUND...")
-		return nil
+		return ctx.Reply("Oops, 404 NOT FOUND...")
 	}
 	return ctx.Reply(fmt.Sprintf(
 		"Quack! Quack!\n\n%s", body,

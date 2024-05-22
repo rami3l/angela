@@ -35,8 +35,7 @@ func Etymology(ctx tgb.Context) error {
 	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
 		log.WithField("result", respStr).Info("/etymology: Wiktionary extract not found")
-		ctx.Reply("Oops, looks like there isn't such a word in Wiktionary...")
-		return nil
+		return ctx.Reply("Oops, looks like there isn't such a word in Wiktionary...")
 	}
 
 	rawExtract := matches[1]

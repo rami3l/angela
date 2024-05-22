@@ -30,8 +30,7 @@ func Cheat(ctx tgb.Context) error {
 	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
 		log.WithField("result", respStr).Info("/cheat: redirect result not found")
-		ctx.Reply("Oops, 404 NOT FOUND...")
-		return nil
+		return ctx.Reply("Oops, 404 NOT FOUND...")
 	}
 	body := matches[1]
 	return ctx.Reply(fmt.Sprintf(
