@@ -18,11 +18,12 @@ func Etymology(ctx tgb.Context) error {
 
 	endpoint := "https://en.wiktionary.org/w/api.php"
 	query := map[string]string{
-		"action":      "query",
-		"format":      "json",
-		"titles":      arg,
-		"prop":        "extracts",
-		"explaintext": "",
+		"page":          arg,
+		"action":        "parse",
+		"format":        "json",
+		"formatversion": "2",
+		"uselang":       "en",
+		"prop":          "wikitext",
 	}
 
 	resp, err := resty.New().R().SetQueryParams(query).Get(endpoint)
@@ -31,7 +32,7 @@ func Etymology(ctx tgb.Context) error {
 	}
 
 	respStr := resp.String()
-	pat := regexp.MustCompile(`\"extract\":\"(.*?[^\\])\"`)
+	pat := regexp.MustCompile(`\"wikitext\":\"(.*?[^\\])\"`)
 	matches := pat.FindStringSubmatch(respStr)
 	if len(matches) < 1 {
 		log.WithField("result", respStr).Info("/etymology: Wiktionary extract not found")
@@ -67,7 +68,7 @@ func extractEtymology(rawExtract string) (entries []string) {
 	lns := strings.Split(extract, "\n")
 	entryLns := []string{}
 	for i := 0; i < len(lns); i++ {
-		for ; i < len(lns) && !strings.Contains(lns[i], "= Etymology"); i++ {
+		for ; i < len(lns) && !strings.Contains(lns[i], "=Etymology"); i++ {
 		}
 		i++
 		for ; i < len(lns) && !strings.HasPrefix(lns[i], "="); i++ {
