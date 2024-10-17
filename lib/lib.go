@@ -11,6 +11,7 @@ import (
 
 	"github.com/rami3l/angela/lib/bot"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	tgb "gopkg.in/telebot.v4"
 )
 
@@ -22,8 +23,8 @@ type Bot struct {
 
 func NewBotFromEnv() *Bot {
 	return &Bot{
-		Token:  os.Getenv("ANGELA_TELEGRAM_BOT_TOKEN"),
-		Listen: os.Getenv("ANGELA_TELEGRAM_BOT_WEBHOOK_LISTEN"),
+		Token:  viper.GetString("telegram_bot_token"),
+		Listen: viper.GetString("telegram_bot_webhook_listen"),
 	}
 }
 

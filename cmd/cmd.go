@@ -7,6 +7,7 @@ import (
 	"github.com/rami3l/angela/lib"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func App() (app *cobra.Command) {
@@ -15,22 +16,30 @@ func App() (app *cobra.Command) {
 		Short: "Launch the `angela` bot",
 	}
 
-	app.Flags().SortFlags = true
+	viper.SetEnvPrefix("angela")
+	viper.AutomaticEnv()
+	flags := app.Flags()
+	flags.SortFlags = true
+
+	const verbosity = "verbosity"
 	defaultVerbosityStr := "INFO"
-	verbosity := app.Flags().StringP("verbosity", "v", defaultVerbosityStr, "Logging verbosity")
+	app.Flags().StringP(verbosity, "v", defaultVerbosityStr, "Logging verbosity")
+	_ = viper.BindPFlag(verbosity, flags.Lookup(verbosity))
 
 	app.Run = func(_ *cobra.Command, args []string) {
 		inner := func() (err error) {
-			verbosityLvl, err := log.ParseLevel(*verbosity)
+			if err1 := godotenv.Load(); err1 != nil {
+				log.Info("`.env` is missing, relying on env vars")
+			}
+			verbosityLvl, err := log.ParseLevel(viper.GetString(verbosity))
 			if err != nil {
 				verbosityLvl, _ = log.ParseLevel(defaultVerbosityStr)
 			}
 			log.SetLevel(verbosityLvl)
-			if err := godotenv.Load(); err != nil {
-				log.Warn("Error loading .env file")
-			}
 
 			log.Info("Angela is waking up...")
+			log.Infof("Current verbosity level: %s", verbosityLvl)
+
 			return lib.NewBotFromEnv().Launch()
 		}
 
