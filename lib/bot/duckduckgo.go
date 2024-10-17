@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 // https://github.com/crazedpsyc/python-duckduckgo/blob/7c9f9d9c6ea2d08ea8ba51d92c2f591656af87bf/duckduckgo.py#L137

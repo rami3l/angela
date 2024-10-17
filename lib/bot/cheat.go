@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 func Cheat(ctx tgb.Context) error {

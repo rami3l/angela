@@ -3,7 +3,7 @@ package bot
 import (
 	"math/rand/v2"
 
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 func Decide(ctx tgb.Context) error {

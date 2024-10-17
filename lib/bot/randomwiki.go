@@ -5,7 +5,7 @@ import (
 
 	"github.com/rami3l/angela/lib/utils"
 	log "github.com/sirupsen/logrus"
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 func RandomWiki(ctx tgb.Context) error {
