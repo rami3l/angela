@@ -4,7 +4,7 @@ import (
 	"cmp"
 	"fmt"
 
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 func Hello(ctx tgb.Context) error {

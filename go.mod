@@ -8,7 +8,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
-	gopkg.in/telebot.v3 v3.3.8
+	gopkg.in/telebot.v4 v4.0.0-beta.4
 )
 
 require (

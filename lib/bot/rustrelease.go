@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	tgb "gopkg.in/telebot.v3"
+	tgb "gopkg.in/telebot.v4"
 )
 
 const (

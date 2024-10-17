@@ -29,10 +29,9 @@ func App() (app *cobra.Command) {
 			if err := godotenv.Load(); err != nil {
 				log.Warn("Error loading .env file")
 			}
-			botToken := os.Getenv("ANGELA_TELEGRAM_BOT_TOKEN")
 
 			log.Info("Angela is waking up...")
-			return lib.LaunchBot(botToken)
+			return lib.NewBotFromEnv().Launch()
 		}
 
 		if err := inner(); err != nil {
