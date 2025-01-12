@@ -9,7 +9,7 @@ ENV CMD_PATH main.go
 COPY . $GOPATH/src/$APP_NAME
 WORKDIR $GOPATH/src/$APP_NAME
 
-# Budild application
+# Build application
 RUN CGO_ENABLED=0 go build -v -o /$APP_NAME $GOPATH/src/$APP_NAME/$CMD_PATH
 
 # Run Stage
@@ -22,7 +22,7 @@ ENV APP_NAME angela
 COPY --from=angela-builder /$APP_NAME .
 
 # Expose application port
-#EXPOSE 8081
+# EXPOSE 8081
 
 # Start app
 CMD ./$APP_NAME
