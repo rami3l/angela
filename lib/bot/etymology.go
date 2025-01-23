@@ -13,8 +13,10 @@ import (
 )
 
 func Etymology(ctx tgb.Context) error {
-	args := ctx.Args()
-	arg := strings.Join(args, " ")
+	_, arg, _ := strings.Cut(ctx.Message().Text, " ")
+	if strings.TrimSpace(arg) == "" {
+		return ctx.Reply("Usage: /etymology <term>")
+	}
 
 	endpoint := "https://en.wiktionary.org/w/api.php"
 	query := map[string]string{
