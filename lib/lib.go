@@ -49,6 +49,7 @@ func (b Bot) Launch() (err error) {
 	t.Handle("/ddg", withLog(bot.DuckDuckGo))
 	t.Handle("/decide", withLog(bot.Decide))
 	t.Handle("/etymology", withLog(bot.Etymology))
+	t.Handle("/eval", withLog(bot.Eval))
 	t.Handle("/hello", withLog(bot.Hello))
 	t.Handle("/randomwiki", withLog(bot.RandomWiki))
 	t.Handle("/rustrelease", withLog(bot.RustRelease))
