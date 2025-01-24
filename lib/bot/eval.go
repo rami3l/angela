@@ -25,7 +25,6 @@ func Eval(ctx tgb.Context) error {
 		"channel":   "nightly",
 		"edition":   "2024",
 		"mode":      "debug",
-		"crate":     "bin",
 		"tests":     false,
 		"backtrace": true,
 		"code":      wrappedSrc,
@@ -38,7 +37,7 @@ func Eval(ctx tgb.Context) error {
 
 	var evalRes rustPlaygroundResp
 	if err := json.Unmarshal(resp.Body(), &evalRes); err != nil {
-		return ctx.Reply("Oops, 500 INTERNAL ERROR while parsing resulting JSON...")
+		return err
 	}
 
 	leader := ":)"
@@ -63,20 +62,20 @@ type rustPlaygroundResp struct {
 }
 
 func wrapMain(src string) string {
-	var printed string
+	var blk string
 	switch {
 	case
 		strings.Contains(src, "print!("),
 		strings.Contains(src, "println!("):
-		printed = fmt.Sprintf("{\n%s\n};", src)
+		blk = "{\n%s\n};"
 	default:
-		printed = fmt.Sprintf("println!(\"{:?}\", {\n%s\n});", src)
+		blk = "println!(\"{:?}\", {\n%s\n});"
 	}
 	return fmt.Sprintf(
 		`#[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> {
 %s
 	Ok(())
 }`,
-		printed,
+		fmt.Sprintf(blk, src),
 	)
 }
