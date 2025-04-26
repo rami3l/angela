@@ -37,7 +37,7 @@ func (b Bot) Launch() (err error) {
 
 	withLog := func(handler ContextHandler) ContextHandler {
 		return func(ctx tgb.Context) (err error) {
-			log.WithField("msg", ctx.Text()).Info("Triggered")
+			log.WithField("msg", ctx.Text()).Info("triggered")
 			if err = handler(ctx); err != nil {
 				log.Warning(err)
 			}
@@ -56,10 +56,10 @@ func (b Bot) Launch() (err error) {
 
 	switch host := b.Listen; host {
 	case "":
-		log.Info("Running in polling mode...")
+		log.Info("running in polling mode...")
 		t.Start()
 	default:
-		log.Infof("Running in webhook mode at `%s`...", host)
+		log.Infof("running in webhook mode at `%s`...", host)
 
 		// See: https://github.com/akumarujon/telebot-webhook
 		mux := http.NewServeMux()
@@ -70,7 +70,11 @@ func (b Bot) Launch() (err error) {
 
 		mux.HandleFunc(fmt.Sprintf("POST /%s", b.Token), func(w http.ResponseWriter, r *http.Request) {
 			body, err := io.ReadAll(r.Body)
-			defer r.Body.Close()
+			defer func() {
+				if err = r.Body.Close(); err != nil {
+					log.Errorf("failed to close request body: %s", err)
+				}
+			}()
 
 			if err != nil {
 				log.Errorf("failed to parse update: %s", err)
@@ -78,7 +82,7 @@ func (b Bot) Launch() (err error) {
 			}
 
 			var update tgb.Update
-			if err := json.Unmarshal(body, &update); err != nil {
+			if err = json.Unmarshal(body, &update); err != nil {
 				log.Errorf("failed to parse update: %s", err)
 				return
 			}
