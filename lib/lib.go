@@ -70,20 +70,20 @@ func (b Bot) Launch() (err error) {
 		})
 
 		mux.HandleFunc(fmt.Sprintf("POST /%s", b.Token), func(w http.ResponseWriter, r *http.Request) {
-			body, err := io.ReadAll(r.Body)
 			defer func() {
-				if err = r.Body.Close(); err != nil {
+				if err := r.Body.Close(); err != nil {
 					log.Errorf("failed to close request body: %s", err)
 				}
 			}()
 
+			body, err := io.ReadAll(r.Body)
 			if err != nil {
 				log.Errorf("failed to parse update: %s", err)
 				return
 			}
 
 			var update tgb.Update
-			if err = json.Unmarshal(body, &update); err != nil {
+			if err := json.Unmarshal(body, &update); err != nil {
 				log.Errorf("failed to parse update: %s", err)
 				return
 			}
