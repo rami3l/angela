@@ -42,8 +42,16 @@ func Etymology(ctx tgb.Context) error {
 
 	rawExtract := matches[1]
 	body := ""
+	// NOTE: The body can be too long to fit into Telegram's message size limit of 4096.
+	// As such, a potentially truncated version of the body is sent.
+	maxLen := 2000
 	for i, entry := range extractEtymology(rawExtract) {
-		body += fmt.Sprintf("%d. %s", i+1, entry) + "\n\n"
+		item := fmt.Sprintf("%d. %s", i+1, entry) + "\n\n"
+		if len(body)+len(item) >= maxLen {
+			body += "...\n\n"
+			break
+		}
+		body += item
 	}
 
 	var reply string
