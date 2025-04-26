@@ -57,22 +57,22 @@ func Etymology(ctx tgb.Context) error {
 	var reply string
 	src := "https://en.wiktionary.org/wiki/" + url.PathEscape(arg)
 	if strings.TrimSpace(body) == "" {
-		log.Info("/etymology: No etymology entries found")
+		log.Info("/etymology: no etymology entries found")
 		reply = fmt.Sprintf("Let me look it up...\n\nOops, it seems that I can't find the etymology in %s...", src)
 	} else {
-		log.WithField("body", body).Debug("/etymology: Got body")
+		log.WithField("body", body).Debug("/etymology: got body")
 		reply = fmt.Sprintf("Let me look it up...\n\n%s:\n\n%ssrc: %s", arg, body, src)
 	}
 	return ctx.Reply(reply)
 }
 
 func extractEtymology(rawExtract string) (entries []string) {
-	log.WithField("rawExtract", rawExtract).Debug("/etymology: Got raw extract")
+	log.WithField("rawExtract", rawExtract).Debug("/etymology: got raw extract")
 	extract, err := utils.UnescapeUtf8(rawExtract)
 	if err != nil {
-		log.Warnf("/etymology: Error unescaping extract: %s", err)
+		log.Warnf("/etymology: error unescaping extract: %s", err)
 	}
-	log.WithField("extract", extract).Debug("/etymology: Got extract")
+	log.WithField("extract", extract).Debug("/etymology: got extract")
 
 	lns := strings.Split(extract, "\n")
 	entryLns := []string{}

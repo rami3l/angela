@@ -45,7 +45,7 @@ func DuckDuckGo(ctx tgb.Context) error {
 	if err := json.Unmarshal(resp.Body(), &respObj); err != nil {
 		return err
 	}
-	log.WithField("resp", fmt.Sprintf("%+v", respObj)).Debug("/ddg: Got recommendation")
+	log.WithField("resp", fmt.Sprintf("%+v", respObj)).Debug("/ddg: got recommendation")
 
 	fstResult := ""
 	if topics := respObj.RelatedTopics; len(topics) != 0 {

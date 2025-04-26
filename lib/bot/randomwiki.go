@@ -13,6 +13,6 @@ func RandomWiki(ctx tgb.Context) error {
 	if err != nil {
 		return err
 	}
-	log.WithField("pageUrl", url).Info("/randomwiki: Got random page")
+	log.WithField("pageUrl", url).Info("/randomwiki: got random page")
 	return ctx.Reply(fmt.Sprintf("(Paper fluttering...)\n\nHere you go!\n%s", url))
 }

@@ -37,8 +37,8 @@ func App() (app *cobra.Command) {
 			}
 			log.SetLevel(verbosityLvl)
 
-			log.Info("Angela is waking up...")
-			log.Infof("Current verbosity level: %s", verbosityLvl)
+			log.Info("angela is waking up...")
+			log.Infof("current verbosity level: %s", verbosityLvl)
 
 			return lib.NewBotFromEnv().Launch()
 		}
