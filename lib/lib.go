@@ -40,6 +40,7 @@ func (b Bot) Launch() (err error) {
 			log.WithField("msg", ctx.Text()).Info("triggered")
 			if err = handler(ctx); err != nil {
 				log.Warning(err)
+				_ = ctx.Send(fmt.Sprintf("Oops, something unexpected has happened!\n\n%s", err))
 			}
 			return
 		}
