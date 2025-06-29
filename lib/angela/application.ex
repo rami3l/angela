@@ -10,6 +10,8 @@ defmodule Angela.Application do
     children = [
       # Starts a worker by calling: Angela.Worker.start_link(arg)
       # {Angela.Worker, arg}
+      ExGram,
+      {Angela.Bot, Application.get_all_env(:ex_gram)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
