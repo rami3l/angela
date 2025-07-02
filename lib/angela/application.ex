@@ -7,12 +7,15 @@ defmodule Angela.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: Angela.Worker.start_link(arg)
-      # {Angela.Worker, arg}
-      ExGram,
-      {Angela.Bot, Application.get_all_env(:ex_gram)}
-    ]
+    children =
+      if Application.get_env(:angela, :enable, true),
+        do: [
+          # Starts a worker by calling: Angela.Worker.start_link(arg)
+          # {Angela.Worker, arg}
+          ExGram,
+          {Angela.Bot, Application.get_all_env(:ex_gram)}
+        ],
+        else: []
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

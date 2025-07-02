@@ -10,7 +10,7 @@ defmodule Angela.Bot do
 
   use ExGram.Bot,
     name: @bot,
-    setup_commands: true
+    setup_commands: Application.get_env(:angela, :setup_commands, false)
 
   middleware(ExGram.Middleware.IgnoreUsername)
 
