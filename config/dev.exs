@@ -1,5 +1,5 @@
 import Config
 
-config :ex_gram, method: :polling
+config :angela, setup_commands: true
 
 import_config "dev.secret.exs"
