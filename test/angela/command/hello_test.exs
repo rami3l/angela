@@ -1,4 +1,4 @@
-defmodule AngelaTest.Command.HelloTest do
+defmodule Angela.Command.HelloTest do
   use ExUnit.Case, async: true
   doctest Angela.Command.Hello
 
