@@ -29,7 +29,8 @@ defmodule Angela.MixProject do
 
       # Dev dependencies
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      # {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:credo, github: "rrrene/credo", only: [:dev, :test], runtime: false, override: true},
       {:assert_match, "~> 1.0", only: [:test]}
     ]
   end
