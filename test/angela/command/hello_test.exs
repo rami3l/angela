@@ -3,26 +3,31 @@ defmodule Angela.Command.HelloTest do
   doctest Angela.Command.Hello
 
   alias Angela.Command.Hello
-  alias ExGram.Model.{Message, ReplyParameters, User}
+  alias ExGram.Model.{Message, User}
 
   import AssertMatch
 
   describe "respond/1" do
+    @respond &Hello.respond/1
+    @msg_id %{message_id: 2048}
+
+    defp msg(params), do: struct!(Message, params |> Map.merge(@msg_id))
+
     test "responds with the provided first name" do
-      %Message{from: %User{first_name: "Alice"}, message_id: 123}
-      |> Hello.respond()
+      msg(%{from: %User{first_name: "Alice"}})
+      |> @respond.()
       |> assert_match(%{
         txt: "Alice, I'm right beside you!",
-        opts: [reply_parameters: %ReplyParameters{message_id: 123}]
+        opts: [reply_parameters: @msg_id]
       })
     end
 
     test "responds with the default greeting when first name is missing" do
-      %Message{from: %User{}, message_id: 456}
-      |> Hello.respond()
+      msg(%{from: %User{}})
+      |> @respond.()
       |> assert_match(%{
         txt: "Hi, I'm right beside you!",
-        opts: [reply_parameters: %ReplyParameters{message_id: 456}]
+        opts: [reply_parameters: @msg_id]
       })
     end
   end
