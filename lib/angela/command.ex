@@ -16,5 +16,6 @@ defmodule Angela.Command do
     def new(txt, opts \\ []), do: %__MODULE__{txt: txt, opts: opts}
   end
 
+  @callback usage() :: String.t()
   @callback respond(msg :: Message.t()) :: Response.t()
 end

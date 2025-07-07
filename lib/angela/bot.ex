@@ -3,26 +3,39 @@ defmodule Angela.Bot do
   The bot's core properties and the registration of commands it can handle.
   """
 
-  alias ExGram.{Cnt, Model.Message}
-  alias Angela.Command.{Hello, Response}
+  alias ExGram.Cnt
+  alias ExGram.Model.{Message, ReplyParameters}
+  alias Angela.Command
 
-  @bot :angela
+  def bot(), do: :angela
 
   use ExGram.Bot,
-    name: @bot,
+    name: bot(),
     setup_commands: Application.get_env(:angela, :setup_commands, false)
 
   middleware(ExGram.Middleware.IgnoreUsername)
 
-  def bot(), do: @bot
-
   @spec reply(module(), Cnt.t(), Message.t()) :: Cnt.t()
   def reply(cmd, cx, msg) do
-    resp = %Response{} = cmd.respond(msg)
-    answer(cx, resp.txt, resp.opts)
+    return = &answer(cx, &1, &2)
+
+    try do
+      resp = %Command.Response{} = cmd.respond(msg)
+      return.(resp.txt, resp.opts)
+    rescue
+      MatchError ->
+        return.(
+          "usage: " <> cmd.usage(),
+          reply_parameters: %ReplyParameters{message_id: msg.message_id}
+        )
+    end
   end
 
   command("hello", description: "👋")
   @impl ExGram.Handler
-  def handle({:command, :hello, msg}, cx), do: Hello |> reply(cx, msg)
+  def handle({:command, :hello, msg}, cx), do: Command.Hello |> reply(cx, msg)
+
+  command("decide", description: "🎲")
+  @impl ExGram.Handler
+  def handle({:command, :decide, msg}, cx), do: Command.Decide |> reply(cx, msg)
 end

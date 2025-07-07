@@ -7,25 +7,23 @@ defmodule Angela.Command.HelloTest do
 
   import AssertMatch
 
-  test "responds with a greeting" do
-    user = %User{first_name: "Alice"}
+  describe "respond/1" do
+    test "responds with the provided first name" do
+      %Message{from: %User{first_name: "Alice"}, message_id: 123}
+      |> Hello.respond()
+      |> assert_match(%{
+        txt: "Alice, I'm right beside you!",
+        opts: [reply_parameters: %ReplyParameters{message_id: 123}]
+      })
+    end
 
-    %Message{from: user, message_id: 123}
-    |> Hello.respond()
-    |> assert_match(%{
-      txt: "Alice, I'm right beside you!",
-      opts: [reply_parameters: %ReplyParameters{message_id: 123}]
-    })
-  end
-
-  test "responds with a default greeting when first name is missing" do
-    user = %User{}
-
-    %Message{from: user, message_id: 456}
-    |> Hello.respond()
-    |> assert_match(%{
-      txt: "Hi, I'm right beside you!",
-      opts: [reply_parameters: %ReplyParameters{message_id: 456}]
-    })
+    test "responds with the default greeting when first name is missing" do
+      %Message{from: %User{}, message_id: 456}
+      |> Hello.respond()
+      |> assert_match(%{
+        txt: "Hi, I'm right beside you!",
+        opts: [reply_parameters: %ReplyParameters{message_id: 456}]
+      })
+    end
   end
 end
