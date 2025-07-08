@@ -38,4 +38,8 @@ defmodule Angela.Bot do
   command("decide", description: "🎲")
   @impl ExGram.Handler
   def handle({:command, :decide, msg}, cx), do: Command.Decide |> reply(cx, msg)
+
+  command("rustrelease", description: "🦀")
+  @impl ExGram.Handler
+  def handle({:command, :rustrelease, msg}, cx), do: Command.RustRelease |> reply(cx, msg)
 end
