@@ -46,7 +46,7 @@ defmodule Angela.Command.EvalTest do
       msg(%{text: "21 + 21"})
       |> @respond.()
       |> assert_match(%{
-        txt: """
+        text: """
         :) exit: 0
 
         STDOUT
@@ -70,7 +70,7 @@ defmodule Angela.Command.EvalTest do
       msg(%{text: "invalid_variable"})
       |> @respond.()
       |> assert_match(%{
-        txt: ":< error[E0425]: cannot find value `invalid_variable` in this scope",
+        text: ":< error[E0425]: cannot find value `invalid_variable` in this scope",
         opts: [reply_parameters: %{message_id: 2048}]
       })
     end
@@ -89,7 +89,7 @@ defmodule Angela.Command.EvalTest do
       msg(%{text: "panic!(\"explicit panic\")"})
       |> @respond.()
       |> assert_match(%{
-        txt: """
+        text: """
         :< exit: 101
 
         STDOUT
@@ -106,7 +106,7 @@ defmodule Angela.Command.EvalTest do
 
       msg(%{text: "println!(\"test\")"})
       |> @respond.()
-      |> assert_match(%{txt: "error: \"HTTP 500\"", opts: [reply_parameters: @msg_id]})
+      |> assert_match(%{text: "error: \"HTTP 500\"", opts: [reply_parameters: @msg_id]})
     end
 
     test "handles network errors" do
@@ -114,7 +114,7 @@ defmodule Angela.Command.EvalTest do
 
       msg(%{text: "println!(\"test\")"})
       |> @respond.()
-      |> assert_match(%{txt: "error: :timeout", opts: [reply_parameters: @msg_id]})
+      |> assert_match(%{text: "error: :timeout", opts: [reply_parameters: @msg_id]})
     end
 
     test "handles unknown response format" do
@@ -124,7 +124,7 @@ defmodule Angela.Command.EvalTest do
 
       msg(%{text: "42"})
       |> @respond.()
-      |> assert_match(%{txt: ":< unknown response format", opts: [reply_parameters: @msg_id]})
+      |> assert_match(%{text: ":< unknown response format", opts: [reply_parameters: @msg_id]})
     end
 
     test "handles empty error field in unsuccessful response" do
@@ -142,7 +142,7 @@ defmodule Angela.Command.EvalTest do
       msg(%{text: "invalid code"})
       |> @respond.()
       |> assert_match(%{
-        txt: """
+        text: """
         :< exit: 1
 
         STDOUT
@@ -168,7 +168,7 @@ defmodule Angela.Command.EvalTest do
       msg(%{text: "println!(\"test\")"})
       |> @respond.()
       |> assert_match(%{
-        txt: """
+        text: """
         :) exit: 0
 
         STDOUT
@@ -189,12 +189,9 @@ defmodule Angela.Command.EvalTest do
         body = Jason.decode!(env.body)
 
         assert body["code"] == """
-               #[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> {
-               println!("{:?}", {
+               #[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> { println!("{:?}", {
                1 + 1
-               });
-               \tOk(())
-               }\
+               }); Ok(()) }\
                """
 
         %{
@@ -215,12 +212,9 @@ defmodule Angela.Command.EvalTest do
 
         assert body["code"] ==
                  """
-                 #[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> {
-                 {
+                 #[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> { {
                  println!("test")
-                 };
-                 \tOk(())
-                 }\
+                 }; Ok(()) }\
                  """
 
         %{

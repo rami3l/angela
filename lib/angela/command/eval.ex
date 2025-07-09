@@ -77,11 +77,6 @@ defmodule Angela.Command.Eval do
         "println!(\"{:?}\", {\n#{src}\n});"
       end
 
-    """
-    #[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> {
-    #{block}
-    \tOk(())
-    }\
-    """
+    "#[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> { #{block} Ok(()) }"
   end
 end

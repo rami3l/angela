@@ -10,10 +10,10 @@ defmodule Angela.Command do
     The response structure for a "raw" command handler.
     """
 
-    @type t :: %__MODULE__{txt: String.t(), opts: keyword()}
-    defstruct txt: "", opts: []
+    @type t :: %__MODULE__{text: String.t(), opts: keyword()}
+    defstruct text: "", opts: []
 
-    def new(txt, opts \\ []), do: %__MODULE__{txt: txt, opts: opts}
+    def new(text, opts \\ []), do: %__MODULE__{text: text, opts: opts}
   end
 
   @callback usage() :: String.t()

@@ -21,7 +21,7 @@ defmodule Angela.Bot do
 
     try do
       resp = %Command.Response{} = cmd.respond(msg)
-      return.(resp.txt, resp.opts)
+      return.(resp.text, resp.opts)
     rescue
       MatchError ->
         return.(
