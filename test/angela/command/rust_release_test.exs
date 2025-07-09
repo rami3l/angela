@@ -17,7 +17,7 @@ defmodule Angela.Command.RustReleaseTest do
       msg(%{date: DateTime.to_unix(~U"2025-05-14 01:02:03Z")})
       |> @respond.()
       |> assert_match(%{opts: [reply_parameters: @msg_id, parse_mode: "Markdown"]})
-      |> then(&Regex.scan(~r/Rust v1\.(\d+)/, &1.txt, capture: :all_but_first))
+      |> then(&Regex.scan(~r/Rust v1\.(\d+)/, &1.text, capture: :all_but_first))
       |> assert_match([["86"], ["87"], ["88"], ["89"]])
     end
   end

@@ -17,7 +17,7 @@ defmodule Angela.Command.DecideTest do
       msg(%{text: " rice "})
       |> @respond.()
       |> assert_match(%{
-        txt: "rice",
+        text: "rice",
         opts: [reply_parameters: @msg_id]
       })
     end
@@ -26,7 +26,7 @@ defmodule Angela.Command.DecideTest do
       msg(%{text: "pizza pasta burger"})
       |> @respond.()
       |> assert_match(
-        %{txt: choice, opts: [reply_parameters: @msg_id]}
+        %{text: choice, opts: [reply_parameters: @msg_id]}
         when choice in ["pizza", "pasta", "burger"]
       )
     end

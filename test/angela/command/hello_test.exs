@@ -17,7 +17,7 @@ defmodule Angela.Command.HelloTest do
       msg(%{from: %User{first_name: "Alice"}})
       |> @respond.()
       |> assert_match(%{
-        txt: "Alice, I'm right beside you!",
+        text: "Alice, I'm right beside you!",
         opts: [reply_parameters: @msg_id]
       })
     end
@@ -26,7 +26,7 @@ defmodule Angela.Command.HelloTest do
       msg(%{from: %User{}})
       |> @respond.()
       |> assert_match(%{
-        txt: "Hi, I'm right beside you!",
+        text: "Hi, I'm right beside you!",
         opts: [reply_parameters: @msg_id]
       })
     end
