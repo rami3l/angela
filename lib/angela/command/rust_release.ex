@@ -21,10 +21,10 @@ defmodule Angela.Command.RustRelease do
     now = msg.date |> DateTime.from_unix!() |> DateTime.to_date()
 
     # Based on https://forge.rust-lang.org/js/index.js
-    stable = rust_v1_release(now)
-    beta = rust_v1_release(Date.add(now, 7 * 6))
-    nightly = rust_v1_release(Date.add(now, 7 * 6 * 2))
-    next = rust_v1_release(Date.add(now, 7 * 6 * 3))
+    stable = v1_release(now)
+    beta = v1_release(Date.add(now, 7 * 6))
+    nightly = v1_release(Date.add(now, 7 * 6 * 2))
+    next = v1_release(Date.add(now, 7 * 6 * 3))
 
     """
     Oh, I just asked Ferris 🦀️...
@@ -41,7 +41,7 @@ defmodule Angela.Command.RustRelease do
     )
   end
 
-  defp rust_v1_release(date) do
+  defp v1_release(date) do
     date_str =
       (minor = date |> minor_version())
       |> release_date()
