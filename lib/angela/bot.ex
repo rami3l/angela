@@ -46,4 +46,8 @@ defmodule Angela.Bot do
   command("eval", description: "⚙️")
   @impl ExGram.Handler
   def handle({:command, :eval, msg}, cx), do: Command.Eval |> reply(cx, msg)
+
+  command("etymology", description: "📖")
+  @impl ExGram.Handler
+  def handle({:command, :etymology, msg}, cx), do: Command.Etymology |> reply(cx, msg)
 end
