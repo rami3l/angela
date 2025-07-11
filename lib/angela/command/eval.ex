@@ -74,7 +74,7 @@ defmodule Angela.Command.Eval do
       if src =~ ~r/print(ln)?!\(/ do
         "{\n#{src}\n};"
       else
-        "println!(\"{:?}\", {\n#{src}\n});"
+        ~s[println!("{:?}", {\n#{src}\n});]
       end
 
     "#[allow(warnings)] fn main() -> Result<(), Box<dyn std::error::Error>> { #{block} Ok(()) }"
