@@ -86,7 +86,7 @@ defmodule Angela.Command.EvalTest do
         |> then(&{:ok, env(&1)})
       end)
 
-      msg(%{text: "panic!(\"explicit panic\")"})
+      msg(%{text: ~S[panic!("explicit panic")]})
       |> @respond.()
       |> assert_match(%{
         text: """
@@ -104,15 +104,15 @@ defmodule Angela.Command.EvalTest do
     test "handles HTTP error responses" do
       expect(Tesla.MockAdapter, :call, fn _env, _opts -> {:ok, env("", status: 500)} end)
 
-      msg(%{text: "println!(\"test\")"})
+      msg(%{text: ~S[println!("test")]})
       |> @respond.()
-      |> assert_match(%{text: "error: \"HTTP 500\"", opts: [reply_parameters: @msg_id]})
+      |> assert_match(%{text: ~S[error: "HTTP 500"], opts: [reply_parameters: @msg_id]})
     end
 
     test "handles network errors" do
       expect(Tesla.MockAdapter, :call, fn _env, _opts -> {:error, :timeout} end)
 
-      msg(%{text: "println!(\"test\")"})
+      msg(%{text: ~S[println!("test")]})
       |> @respond.()
       |> assert_match(%{text: "error: :timeout", opts: [reply_parameters: @msg_id]})
     end
@@ -165,7 +165,7 @@ defmodule Angela.Command.EvalTest do
         |> then(&{:ok, env(&1)})
       end)
 
-      msg(%{text: "println!(\"test\")"})
+      msg(%{text: ~S[println!("test")]})
       |> @respond.()
       |> assert_match(%{
         text: """
@@ -226,7 +226,7 @@ defmodule Angela.Command.EvalTest do
         |> then(&{:ok, env(&1)})
       end)
 
-      msg(%{text: "println!(\"test\")"}) |> @respond.()
+      msg(%{text: ~S[println!("test")]}) |> @respond.()
     end
 
     test "verifies all request parameters are correctly set" do
