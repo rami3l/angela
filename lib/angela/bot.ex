@@ -3,13 +3,13 @@ defmodule Angela.Bot do
   The bot's core properties and the registration of commands it can handle.
   """
 
+  alias Angela.Command
   alias ExGram.Cnt
   alias ExGram.Model.{Message, ReplyParameters}
-  alias Angela.Command
 
   import Angela.Bot.Macros
 
-  def bot(), do: :angela
+  def bot, do: :angela
 
   use ExGram.Bot,
     name: bot(),

@@ -13,7 +13,7 @@ defmodule Angela.Command.RustRelease do
   @behaviour Angela.Command
 
   @impl true
-  def usage(), do: "/rustrelease"
+  def usage, do: "/rustrelease"
 
   @impl true
   def respond(msg = %Message{}) do

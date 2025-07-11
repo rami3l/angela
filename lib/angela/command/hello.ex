@@ -9,7 +9,7 @@ defmodule Angela.Command.Hello do
   @behaviour Angela.Command
 
   @impl true
-  def usage(), do: "/hello"
+  def usage, do: "/hello"
 
   @impl true
   def respond(msg = %Message{from: sender = %User{}}) do
