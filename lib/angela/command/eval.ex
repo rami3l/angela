@@ -9,7 +9,7 @@ defmodule Angela.Command.Eval do
   @behaviour Angela.Command
 
   @impl true
-  def usage(), do: "/eval <rust_code>"
+  def usage, do: "/eval <rust_code>"
 
   @impl true
   def respond(msg = %Message{text: src}) when src != "" do
@@ -61,7 +61,7 @@ defmodule Angela.Command.Eval do
     end
   end
 
-  defp client() do
+  defp client do
     [
       {Tesla.Middleware.Headers, [{"content-type", "application/json"}]},
       Tesla.Middleware.JSON

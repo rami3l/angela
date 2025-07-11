@@ -9,7 +9,7 @@ defmodule Angela.Command.Decide do
   @behaviour Angela.Command
 
   @impl true
-  def usage(), do: "/decide <choice1> <choice2> ..."
+  def usage, do: "/decide <choice1> <choice2> ..."
 
   @impl true
   def respond(msg = %Message{}) do

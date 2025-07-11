@@ -10,7 +10,7 @@ defmodule Angela.Command.Etymology do
   @behaviour Angela.Command
 
   @impl true
-  def usage(), do: "/etymology <term>"
+  def usage, do: "/etymology <term>"
 
   @impl true
   def respond(msg = %Message{}) do
@@ -124,7 +124,7 @@ defmodule Angela.Command.Etymology do
 
   defp wiktionary_page(term), do: "https://en.wiktionary.org/wiki/" <> URI.encode(term)
 
-  defp client() do
+  defp client do
     [
       {Tesla.Middleware.Headers, [{"content-type", "application/json"}]},
       Tesla.Middleware.JSON
