@@ -7,6 +7,8 @@ defmodule Angela.Bot do
   alias ExGram.Model.{Message, ReplyParameters}
   alias Angela.Command
 
+  import Angela.Bot.Macros
+
   def bot(), do: :angela
 
   use ExGram.Bot,
@@ -31,23 +33,9 @@ defmodule Angela.Bot do
     end
   end
 
-  command("hello", description: "👋")
-  @impl ExGram.Handler
-  def handle({:command, :hello, msg}, cx), do: Command.Hello |> reply(cx, msg)
-
-  command("decide", description: "🎲")
-  @impl ExGram.Handler
-  def handle({:command, :decide, msg}, cx), do: Command.Decide |> reply(cx, msg)
-
-  command("rustrelease", description: "🦀")
-  @impl ExGram.Handler
-  def handle({:command, :rustrelease, msg}, cx), do: Command.RustRelease |> reply(cx, msg)
-
-  command("eval", description: "⚙️")
-  @impl ExGram.Handler
-  def handle({:command, :eval, msg}, cx), do: Command.Eval |> reply(cx, msg)
-
-  command("etymology", description: "📖")
-  @impl ExGram.Handler
-  def handle({:command, :etymology, msg}, cx), do: Command.Etymology |> reply(cx, msg)
+  defcommand(Command.Hello, "hello", "👋")
+  defcommand(Command.Decide, "decide", "🎲")
+  defcommand(Command.RustRelease, "rustrelease", "🦀")
+  defcommand(Command.Eval, "eval", "⚙️")
+  defcommand(Command.Etymology, "etymology", "📖")
 end
