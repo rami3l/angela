@@ -15,11 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Populate fake secrets
-        run: |
-          cp ./config/secret.exs.example ./config/dev.secret.exs
-          cp ./config/secret.exs.example ./config/prod.secret.exs
-
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
