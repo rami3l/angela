@@ -1,0 +1,8 @@
+services:
+  angela:
+    container_name: angela
+    env_file: .env
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
