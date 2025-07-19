@@ -1,21 +1,22 @@
 # Angela
 
-**TODO: Add description**
+A random Telegram bot with in-chat utilities for my own liking.
 
-## Installation
+## Quick Start
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `angela` to your list of dependencies in `mix.exs`:
+Some required environment variables should be set up before running this bot
+(replace the token with your own):
 
-```elixir
-def deps do
-  [
-    {:angela, "~> 0.1.0"}
-  ]
-end
+```txt
+ANGELA_TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/angela>.
+Alternatively, you can create a `.env` file to include these variables.
 
+### Running the Bot in Polling Mode
+
+No further setup is needed.
+
+### Running the Bot in Webhook Mode
+
+To be implemented...
