@@ -45,9 +45,17 @@ defmodule Angela.Command.Etymology do
     ]
     |> then(&Tesla.get(client(), @api_endpoint, query: &1))
     |> case do
-      {:ok, %Tesla.Env{status: 200, body: body}} -> parse_wiktionary(body)
-      {:ok, %Tesla.Env{status: status}} -> {:error, "HTTP #{status}"}
-      {:error, reason} -> {:error, reason}
+      {:ok, %Tesla.Env{status: 200, body: body}} ->
+        parse_wiktionary(body)
+
+      {:ok, %Tesla.Env{status: status, body: body}} when is_bitstring(body) ->
+        {:error, "HTTP #{status}: #{body}"}
+
+      {:ok, %Tesla.Env{status: status}} ->
+        {:error, "HTTP #{status}"}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
