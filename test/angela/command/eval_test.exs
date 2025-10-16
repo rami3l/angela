@@ -25,7 +25,7 @@ defmodule Angela.Command.EvalTest do
     test "responds with successful execution result" do
       expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert_match(env, %{method: :post, url: "https://play.rust-lang.org/execute"})
-        assert {"content-type", "application/json"} in env.headers
+        assert {"Content-Type", "application/json"} in env.headers
 
         body = Jason.decode!(env.body)
 

@@ -134,7 +134,12 @@ defmodule Angela.Command.Etymology do
 
   defp client do
     [
-      {Tesla.Middleware.Headers, [{"content-type", "application/json"}]},
+      {Tesla.Middleware.Headers,
+       [
+         {"Content-Type", "application/json"},
+         {"User-Agent",
+          "AngelaTelegramBot/#{Angela.version()} (https://github.com/rami3l/angela) Tesla"}
+       ]},
       Tesla.Middleware.JSON
     ]
     |> Tesla.client()

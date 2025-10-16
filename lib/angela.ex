@@ -1,18 +1,6 @@
 defmodule Angela do
-  @moduledoc """
-  Documentation for `Angela`.
-  """
+  @moduledoc false
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Angela.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
+  @version Mix.Project.config()[:version]
+  def version, do: @version
 end

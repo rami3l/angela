@@ -63,7 +63,7 @@ defmodule Angela.Command.Eval do
 
   defp client do
     [
-      {Tesla.Middleware.Headers, [{"content-type", "application/json"}]},
+      {Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]},
       Tesla.Middleware.JSON
     ]
     |> Tesla.client()

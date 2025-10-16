@@ -50,7 +50,7 @@ defmodule Angela.Command.EtymologyTest do
 
       expect(Tesla.MockAdapter, :call, fn env, _opts ->
         assert_match(env, %{method: :get, url: "https://en.wiktionary.org/w/api.php"})
-        assert {"content-type", "application/json"} in env.headers
+        assert {"Content-Type", "application/json"} in env.headers
 
         env.query
         |> assert_match(
