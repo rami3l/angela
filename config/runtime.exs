@@ -15,3 +15,6 @@ config :ex_gram, method: :polling
 if config_env() != :test do
   config :ex_gram, token: env!("ANGELA_TELEGRAM_BOT_TOKEN", :string!)
 end
+
+# Configure angela with environment variables
+config :angela, exn_tokens: %{nasa: env!("ANGELA_EXN_TOKEN_NASA", :string?, nil)}

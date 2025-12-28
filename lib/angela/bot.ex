@@ -10,10 +10,11 @@ defmodule Angela.Bot do
   import Angela.Bot.Macros
 
   def bot, do: :angela
+  def get_env(key, default \\ nil), do: Application.get_env(bot(), key, default)
 
   use ExGram.Bot,
     name: bot(),
-    setup_commands: Application.get_env(:angela, :setup_commands, false)
+    setup_commands: get_env(:setup_commands, false)
 
   middleware(ExGram.Middleware.IgnoreUsername)
 
@@ -33,9 +34,10 @@ defmodule Angela.Bot do
     end
   end
 
-  defcommand(Command.Hello, "hello", "👋")
+  defcommand(Command.APOD, "apod", "🪐")
   defcommand(Command.Decide, "decide", "🎲")
-  defcommand(Command.RustRelease, "rustrelease", "🦀")
-  defcommand(Command.Eval, "eval", "⚙️")
   defcommand(Command.Etymology, "etymology", "📖")
+  defcommand(Command.Eval, "eval", "⚙️")
+  defcommand(Command.Hello, "hello", "👋")
+  defcommand(Command.RustRelease, "rustrelease", "🦀")
 end
