@@ -24,7 +24,7 @@ defmodule Angela.Command.APOD do
     end
     |> fetch_apod()
     |> case do
-      {:ok, entries} when entries != [] -> response_text(entries)
+      {:ok, entry} -> response_text(entry)
       {:error, reason} -> "Oops, looks like I have encountered an error: #{inspect(reason)}"
     end
     |> Response.new(
@@ -55,26 +55,19 @@ defmodule Angela.Command.APOD do
     end
   end
 
-  defp response_text(entries) do
-    %{
-      "date" => date,
-      "title" => title,
-      "explanation" => explanation
-    } = entries
-
+  defp response_text(entry = %{"date" => date, "title" => title, "explanation" => details}) do
     """
     Here's the daily news from NASA:
 
     <blockquote expandable>
     <b>#{title}</b>, #{date}
 
-    #{explanation}
+    #{details}
     </blockquote>
-    #{entries["hdurl"] || entries["url"] || ""}
+
+    #{entry["hdurl"] || entry["url"] || ""}
     """
   end
 
-  defp client do
-    [Tesla.Middleware.JSON] |> Tesla.client()
-  end
+  defp client, do: [Tesla.Middleware.JSON] |> Tesla.client()
 end
