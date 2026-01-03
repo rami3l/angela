@@ -16,7 +16,7 @@ defmodule Angela.Command.APOD do
   def respond(msg = %Message{}) do
     case String.trim(msg.text) do
       "" ->
-        Date.utc_today()
+        nil
 
       term ->
         {:ok, erl} = Calendar.ISO.parse_date(term, :basic)
@@ -36,7 +36,7 @@ defmodule Angela.Command.APOD do
   @api_endpoint "https://api.nasa.gov/planetary/apod"
   defp fetch_apod(date) do
     [
-      date: Date.to_iso8601(date),
+      date: date && Date.to_iso8601(date),
       api_key: Angela.Bot.get_env(:exn_tokens).nasa
     ]
     |> then(&Tesla.get(client(), @api_endpoint, query: &1))
