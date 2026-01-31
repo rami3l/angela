@@ -13,7 +13,7 @@ updates:
   - package-ecosystem: "mix"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     groups:
       minors:
         update-types:
