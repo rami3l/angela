@@ -97,6 +97,10 @@ defmodule Angela.Command.EtymologyTest do
         {:ok, env(wiktionary_response)}
       end)
 
+      expect(Tesla.MockAdapter, :call, fn _env, _opts ->
+        {:ok, env(%{})}
+      end)
+
       msg(%{text: "nonexistentword"})
       |> @respond.()
       |> assert_match(%Response{
@@ -118,6 +122,10 @@ defmodule Angela.Command.EtymologyTest do
 
       expect(Tesla.MockAdapter, :call, fn _env, _opts ->
         {:ok, env(wiktionary_response)}
+      end)
+
+      expect(Tesla.MockAdapter, :call, fn _env, _opts ->
+        {:ok, env(%{})}
       end)
 
       msg(%{text: "someword"})
@@ -191,6 +199,102 @@ defmodule Angela.Command.EtymologyTest do
       |> assert_match(%Response{text: text, opts: [reply_parameters: @msg_id]})
 
       assert text =~ "Oops, looks like I have encountered an error:"
+    end
+
+    test "responds with 'did you mean' on searchinfo suggestion" do
+      not_found_response = %{
+        "query" => %{"pages" => %{"-1" => %{"missing" => ""}}}
+      }
+
+      suggestion_response = %{
+        "query" => %{"searchinfo" => %{"suggestion" => "elephant"}, "search" => []}
+      }
+
+      expect(Tesla.MockAdapter, :call, fn req, _opts ->
+        assert_match(req, %{method: :get, url: "https://en.wiktionary.org/w/api.php"})
+
+        req.query
+        |> assert_match(
+          action: "query",
+          format: "json",
+          titles: "ellephant",
+          prop: "extracts",
+          explaintext: "",
+          utf8: "1"
+        )
+
+        {:ok, env(not_found_response)}
+      end)
+
+      expect(Tesla.MockAdapter, :call, fn req, _opts ->
+        assert_match(req, %{method: :get, url: "https://en.wiktionary.org/w/api.php"})
+
+        req.query
+        |> assert_match(
+          action: "query",
+          format: "json",
+          list: "search",
+          srsearch: "ellephant",
+          srinfo: "suggestion",
+          utf8: "1"
+        )
+
+        {:ok, env(suggestion_response)}
+      end)
+
+      msg(%{text: "ellephant"})
+      |> @respond.()
+      |> assert_match(%Response{text: text, opts: [reply_parameters: @msg_id]})
+
+      assert text =~ "Did you mean elephant?"
+    end
+
+    test "responds with 'did you mean' on relevant search result" do
+      not_found_response = %{
+        "query" => %{"pages" => %{"-1" => %{"missing" => ""}}}
+      }
+
+      search_result_response = %{
+        "query" => %{"searchinfo" => %{}, "search" => [%{"title" => "cannibal"}]}
+      }
+
+      expect(Tesla.MockAdapter, :call, fn req, _opts ->
+        assert_match(req, %{method: :get, url: "https://en.wiktionary.org/w/api.php"})
+
+        req.query
+        |> assert_match(
+          action: "query",
+          format: "json",
+          titles: "Cannibal",
+          prop: "extracts",
+          explaintext: "",
+          utf8: "1"
+        )
+
+        {:ok, env(not_found_response)}
+      end)
+
+      expect(Tesla.MockAdapter, :call, fn req, _opts ->
+        assert_match(req, %{method: :get, url: "https://en.wiktionary.org/w/api.php"})
+
+        req.query
+        |> assert_match(
+          action: "query",
+          format: "json",
+          list: "search",
+          srsearch: "Cannibal",
+          srinfo: "suggestion",
+          utf8: "1"
+        )
+
+        {:ok, env(search_result_response)}
+      end)
+
+      msg(%{text: "Cannibal"})
+      |> @respond.()
+      |> assert_match(%Response{text: text, opts: [reply_parameters: @msg_id]})
+
+      assert text =~ "Did you mean cannibal?"
     end
 
     test "truncates long responses to fit message limit" do

@@ -24,6 +24,9 @@ defmodule Angela.Command.Etymology do
       {:ok, []} ->
         "Let me look it up...\n\nOops, it seems that I can't find the etymology in #{wiktionary_page(term)} ..."
 
+      {:error, {:not_found_with_alt, alt}} ->
+        "Oops, looks like there isn't such a page in Wiktionary...\n\nDid you mean #{alt}?"
+
       {:error, :not_found} ->
         "Oops, looks like there isn't such a page in Wiktionary..."
 
@@ -33,6 +36,8 @@ defmodule Angela.Command.Etymology do
     |> Response.new(reply_parameters: %ReplyParameters{message_id: msg.message_id})
   end
 
+  # NOTE: It'd be interesting to try the API call in the sandbox first:
+  # https://en.wiktionary.org/wiki/Special:ApiSandbox#action=parse&page=Pet_door&format=json
   @api_endpoint "https://en.wiktionary.org/w/api.php"
   defp fetch_etymology(term) do
     [
@@ -46,7 +51,14 @@ defmodule Angela.Command.Etymology do
     |> then(&Tesla.get(client(), @api_endpoint, query: &1))
     |> case do
       {:ok, %Tesla.Env{status: 200, body: body}} ->
-        parse_wiktionary(body)
+        with {:error, :not_found} <- parse_wiktionary(body),
+             {:alt, {:ok, alt}} <- {:alt, fetch_alternative(term)} do
+          {:error, {:not_found_with_alt, alt}}
+        else
+          {:ok, entries} -> {:ok, entries}
+          {:error, reason} -> {:error, reason}
+          {:alt, {:error, _}} -> {:error, :not_found}
+        end
 
       {:ok, %Tesla.Env{status: status, body: body}} when is_bitstring(body) ->
         {:error, "HTTP #{status}: #{body}"}
@@ -60,15 +72,44 @@ defmodule Angela.Command.Etymology do
   end
 
   defp parse_wiktionary(body) do
-    case body do
-      %{"query" => %{"pages" => pages}} ->
-        case pages |> Map.values() |> List.first() do
-          %{"extract" => extract} when is_binary(extract) -> {:ok, extract_etymology(extract)}
-          _ -> {:error, :not_found}
-        end
+    with %{"query" => %{"pages" => pages}} <- body,
+         [page | _] <- Map.values(pages),
+         {:page, %{"extract" => extract}} <- {:page, page},
+         true <- is_binary(extract) do
+      {:ok, extract_etymology(extract)}
+    else
+      %{} -> {:error, :invalid_response}
+      vs when is_list(vs) -> {:error, :not_found}
+      {:page, _} -> {:error, :not_found}
+      _ -> {:error, :invalid_response}
+    end
+  end
 
-      _ ->
-        {:error, :invalid_response}
+  defp fetch_alternative(term) do
+    # https://lists.wikimedia.org/hyperkitty/list/wiktionary-l@lists.wikimedia.org/message/D5FDPOCJ3TJPSLCGD42UBKHYTC72XEFM/
+    # https://en.wiktionary.org/w/api.php?action=query&format=json&list=search&srsearch=ellephant&srinfo=suggestion&utf8=1
+    # https://en.wiktionary.org/w/api.php?action=query&format=json&list=search&srsearch=Cannibal&srinfo=suggestion&utf8=1
+    [
+      action: "query",
+      format: "json",
+      list: "search",
+      srsearch: term,
+      srinfo: "suggestion",
+      utf8: "1"
+    ]
+    |> then(&Tesla.get(client(), @api_endpoint, query: &1))
+    |> case do
+      {:ok, %Tesla.Env{status: 200, body: body}} -> parse_alternative(body)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp parse_alternative(body) do
+    case body do
+      %{"query" => %{"searchinfo" => %{"suggestion" => alt}}} when is_binary(alt) -> {:ok, alt}
+      %{"query" => %{"search" => [%{"title" => alt} | _]}} when is_binary(alt) -> {:ok, alt}
+      %{"query" => %{}} -> {:error, :invalid_response}
+      _ -> {:error, :not_found}
     end
   end
 
