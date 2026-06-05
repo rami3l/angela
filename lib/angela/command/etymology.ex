@@ -5,7 +5,6 @@ defmodule Angela.Command.Etymology do
 
   alias Angela.Command.Response
   alias ExGram.Model.{Message, ReplyParameters}
-  require Logger
 
   @behaviour Angela.Command
 
