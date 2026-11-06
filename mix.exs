@@ -23,7 +23,7 @@ defmodule Angela.MixProject do
   defp deps do
     [
       {:dotenvy, "~> 1.2.1"},
-      {:ex_gram, "~> 0.55"},
+      {:ex_gram, "~> 0.71"},
       {:tesla, "~> 1.2"},
       {:hackney, "~> 4.0"},
       {:jason, ">= 1.0.0"},
